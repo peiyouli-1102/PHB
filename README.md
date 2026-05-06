@@ -1,6 +1,6 @@
 # PHB
 
-个人主页与博客（纯静态 HTML/CSS/JS）。
+个人主页与博客（纯静态 HTML/CSS/JS）。https://peiyouli-1102.github.io/PHB/
 
 ## 本地预览
 

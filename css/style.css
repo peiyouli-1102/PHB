@@ -210,6 +210,10 @@ h2 {
   font-size: 0.88rem;
 }
 
+.foot .stats {
+  margin: 0.45rem 0 0;
+}
+
 /* 博客列表 */
 .post-list {
   list-style: none;
