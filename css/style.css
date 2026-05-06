@@ -157,6 +157,19 @@ h2 {
   color: var(--muted);
   font-size: 0.92rem;
 }
+/* ===== 卡片内列表：去间距，统一缩进 ===== */
+.card ul {
+  margin: 0;               /* 去掉默认上下外边距，与 .card p 的 margin:0 呼应 */
+  padding-left: 1.5em;     /* 统一左侧缩进，你可以调节这个数值 */
+  list-style: none;        /* 去掉圆点，若想保留圆点则写 list-style: disc; */
+}
+
+.card li {
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;   /* 比段落小一点，按需调整 */
+  color: var(--muted);   /* 保持与卡片段落文字颜色一致，可加可不加 */
+}
 
 .cta {
   margin-top: 2rem;
