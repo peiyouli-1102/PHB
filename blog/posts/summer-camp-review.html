@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>夏令营知识复习 — 李佩优</title>
+    <meta
+      name="description"
+      content="夏令营复习笔记：数分、高代与解析几何、实变函数、复变函数、近世代数、微分几何的知识框架与要点清单。"
+    />
+    <link rel="stylesheet" href="../../css/style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <nav class="nav" aria-label="主导航">
+        <a class="brand" href="../../index.html">李佩优</a>
+        <a href="../../index.html#about">简介</a>
+        <a href="../../index.html#projects">项目与学习</a>
+        <a href="../index.html">博客</a>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <article class="post" itemscope itemtype="https://schema.org/BlogPosting">
+        <header>
+          <h1 itemprop="headline">夏令营知识复习</h1>
+          <p class="meta">
+            <time dateTime="2026-05-11" itemprop="datePublished">2026-05-11</time> · 复习 · 数学
+          </p>
+        </header>
+
+        <section aria-labelledby="intro-heading">
+          <h2 id="intro-heading">0. 使用方式（建议）</h2>
+          <p>
+            这篇文章按板块给出复习框架与「最小必会清单」。你可以把每个条目补充为：定义→典型例子→关键定理→常用方法→常见坑点。若你有具体院校的
+            考察重点/题型，我也可以据此把清单改成更贴合的复习顺序。
+          </p>
+        </section>
+
+        <section aria-labelledby="analysis-heading">
+          <h2 id="analysis-heading">1. 数分（数学分析）</h2>
+          <p class="note">关键词：极限与连续、微分/积分、级数、反例意识、证明模板。</p>
+          <ul>
+            <li>极限与连续：ε-δ 语言、闭区间性质、紧致性与一致连续的常用推法。</li>
+            <li>微分：中值定理体系（Rolle/Lagrange/Cauchy）、Taylor 展开与余项、凸性与不等式。</li>
+            <li>Riemann 积分：可积判别、变限积分与 Leibniz 法则（会用不必过度记忆）。</li>
+            <li>级数：数项级数判别法；幂级数收敛半径与逐项运算；函数项级数一致收敛与交换极限。</li>
+            <li>常见题：证明单调有界/收敛；构造反例；估计误差/余项；交换极限/积分/求和的条件。</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="algebra-geo-heading">
+          <h2 id="algebra-geo-heading">2. 高代与解析几何</h2>
+          <p class="note">关键词：线性空间、线性变换、内积与正交、特征值、二次型、坐标变换。</p>
+          <ul>
+            <li>线性代数主线：线性相关、基与维数、子空间与直和、线性映射的核与像、秩-零化度定理。</li>
+            <li>矩阵：相似与对角化、Jordan 形（若要求）、最小多项式/特征多项式的基础关系。</li>
+            <li>内积空间：Gram-Schmidt、正交投影、对称矩阵谱定理、正定性判别（顺序主子式/特征值）。</li>
+            <li>二次型：配方法与合同变换、规范形、几何意义与分类。</li>
+            <li>解析几何：二次曲线/曲面标准型、平移旋转消去交叉项、法向量与距离公式、线面关系。</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="real-heading">
+          <h2 id="real-heading">3. 实变函数</h2>
+          <p class="note">关键词：测度、可测、Lebesgue 积分、收敛定理、\(L^p\) 空间。</p>
+          <ul>
+            <li>可测性：σ-代数、Borel 集、可测函数的闭包性质（极限、上下确界、复合）。</li>
+            <li>Lebesgue 积分：简单函数逼近、与 Riemann 的对比、积分的线性与单调性。</li>
+            <li>三大收敛定理：单调收敛（MCT）、Fatou 引理、控制收敛（DCT）。</li>
+            <li>\(L^p\)：Holder / Minkowski，不等式的适用条件与典型应用（估计与收敛）。</li>
+            <li>常见题：构造不可积/不可测例子；证明交换极限与积分；在 \(L^p\) 中的收敛关系区分。</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="complex-heading">
+          <h2 id="complex-heading">4. 复变函数</h2>
+          <p class="note">关键词：解析、Cauchy 理论、留数、级数展开、整函数与保形。</p>
+          <ul>
+            <li>基本判别：C-R 方程、调和函数与共轭调和、解析函数的局部性质。</li>
+            <li>Cauchy 定理与公式：积分为零条件、估计（Cauchy 不等式）、高阶导数公式。</li>
+            <li>级数：幂级数、Laurent 展开；孤立奇点分类（可去/极点/本性）。</li>
+            <li>留数：基本留数计算套路、辐角原理/辐角变化（若涉及）、典型实积分计算。</li>
+            <li>常见题：证明某函数不解析；计算围道积分；利用留数算积分；讨论奇点与主部。</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="modern-alg-heading">
+          <h2 id="modern-alg-heading">5. 近世代数</h2>
+          <p class="note">关键词：群、环、域、同态与商结构、作用、分解与构造。</p>
+          <ul>
+            <li>群论：子群、陪集、Lagrange 定理、同态基本定理、正规子群与商群。</li>
+            <li>群作用：轨道-稳定子、Burnside（若涉及）、共轭作用与类方程。</li>
+            <li>环与理想：同态、商环、主理想整环/欧几里得整环（若课程要求）。</li>
+            <li>域与多项式：不可约、多项式环、分裂域/代数扩张的直观理解（按课程深度取舍）。</li>
+            <li>常见题：判断结构是否为群/环；构造同态与核；求商结构；用作用计数或证明同构。</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="diff-geo-heading">
+          <h2 id="diff-geo-heading">6. 微分几何</h2>
+          <p class="note">关键词：曲线论、曲面第一/二基本形式、曲率、测地线与典型曲面。</p>
+          <ul>
+            <li>空间曲线：Frenet 标架、曲率与挠率、弧长参数化、常见曲线的计算。</li>
+            <li>曲面：参数曲面与切空间、第一基本形式（度量）与面积元。</li>
+            <li>第二基本形式：法向、Weingarten 映射、主曲率、Gaussian/Mean 曲率。</li>
+            <li>典型曲面：球面、圆柱、旋转曲面；会算基本形式与曲率并解释几何意义。</li>
+            <li>常见题：给定参数化求法向与曲率；判定是否为测地线（按课程要求）。</li>
+          </ul>
+        </section>
+
+        <p class="back">
+          <a href="../index.html">← 返回博客列表</a>
+          ·
+          <a href="../../index.html">返回主页</a>
+        </p>
+      </article>
+    </main>
+
+    <footer class="foot">
+      <p>© <span id="year"></span> 李佩优</p>
+    </footer>
+    <script src="../../js/main.js"></script>
+  </body>
+</html>
