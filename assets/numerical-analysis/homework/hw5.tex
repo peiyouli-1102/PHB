@@ -1,0 +1,121 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage[UTF8]{ctex} % 用于中文支持，如果不需要中文，可以移除此行
+
+\newtheorem{problem}{问题}
+\newtheorem{solution}{解答}
+\title{数值分析第五周作业}
+\date{\today}
+\author{李佩优PB23000270}
+\geometry{a4paper,scale=0.8}
+\begin{document}
+\maketitle
+\section*{6.12}
+\subsection*{4}
+证明：如果函数$f$和$g$满足
+$$f(x_j)=\langle g,E_j \rangle_n  \quad (x_j=2\pi j/n)$$
+那么$g(x_j)=n \langle f,E_j \rangle_n$
+
+
+证明：设 \(\omega = e^{2\pi i/n}\)，\(x_j = 2\pi j/n\)（\(j=0,1,\dots,n-1\)）。定义内积 \(\langle u,v \rangle_n = \frac{1}{n}\sum_{k=0}^{n-1} u(x_k) v(x_k)\)（无共轭），并令 \(E_j(x)=e^{ijx}\)，则 \(E_j(x_k)=\omega^{jk}\)。由条件 \(f(x_j)=\langle g, E_j \rangle_n\) 得
+\[
+f_j = \frac{1}{n}\sum_{k=0}^{n-1} g_k \omega^{jk}. \tag{1}
+\]
+将 (1) 两边乘以 \(\omega^{-jl}\) 并对 \(j\) 求和，利用正交性 \(\sum_{j=0}^{n-1} \omega^{j(k-l)} = n\delta_{k,l}\)，得
+\[
+\sum_{j=0}^{n-1} f_j \omega^{-jl} = \frac{1}{n}\sum_{k=0}^{n-1} g_k \sum_{j=0}^{n-1} \omega^{j(k-l)} = g_l. \tag{2}
+\]
+由于 \(f\) 和 \(g\) 是实函数，取共轭得
+\[
+g_l = \overline{g_l} = \sum_{j=0}^{n-1} \overline{f_j} \omega^{jl} = \sum_{j=0}^{n-1} f_j \omega^{jl}. \tag{3}
+\]
+另一方面，
+\[
+n\langle f, E_l \rangle_n = n\cdot\frac{1}{n}\sum_{j=0}^{n-1} f_j E_l(x_j) = \sum_{j=0}^{n-1} f_j \omega^{jl}. \tag{4}
+\]
+比较 (3) 和 (4) 得 \(g_l = n\langle f, E_l \rangle_n\)，即 \(g(x_l)=n\langle f, E_l \rangle_n\)。证毕。
+
+\subsection*{5}
+
+用一个适当的指数等式的实部和虚部，证明：
+
+$$\frac{1}{n}\sum_{j=0}^{n-1} \cos \frac{2\pi jk}{n} = \begin{cases} 1 & k \equiv 0 \pmod{n} \\ 0 & k \not\equiv 0 \pmod{n} \end{cases}$$
+$$\frac{1}{n}\sum_{j=0}^{n-1} \sin \frac{2\pi jk}{n} = 0$$
+
+考虑指数和 \(S = \sum_{j=0}^{n-1} e^{2\pi i jk/n}\)。当 \(k \equiv 0 \pmod{n}\) 时，\(e^{2\pi i jk/n}=1\)，故 \(S=n\)；否则，由等比数列求和公式得
+\[
+S = \frac{1-e^{2\pi i k}}{1-e^{2\pi i k/n}} = 0.
+\]
+因此
+\[
+\sum_{j=0}^{n-1} \cos\frac{2\pi jk}{n} = \operatorname{Re}(S) = \begin{cases}
+n, & k \equiv 0 \pmod{n},\\
+0, & k \not\equiv 0 \pmod{n},
+\end{cases}
+\]
+\[
+\sum_{j=0}^{n-1} \sin\frac{2\pi jk}{n} = \operatorname{Im}(S) = 0.
+\]
+两边除以 \(n\) 即得
+\[
+\frac{1}{n}\sum_{j=0}^{n-1} \cos\frac{2\pi jk}{n} = \begin{cases}
+1, & k \equiv 0 \pmod{n},\\
+0, & k \not\equiv 0 \pmod{n},
+\end{cases}
+\qquad
+\frac{1}{n}\sum_{j=0}^{n-1} \sin\frac{2\pi jk}{n} = 0.
+\]
+\section*{6.13}
+\subsection*{6}
+
+证明：
+$$\langle f, E_j \rangle_{2n} = \frac{1}{2}(u_j + v_j)$$
+$$\langle f, E_{j+n} \rangle_{2n} = \frac{1}{2}(u_j - v_j)$$
+其中，$u_j = \langle f, E_j \rangle_n$，$v_j = e^{-ij\pi/n}\langle T_{\pi/n} , E_j \rangle_n$。
+这里$T_{\pi/n}$是用$(T_{\pi/n})(x)=f(x+\pi/n)$定义的变换算子。
+
+
+考虑周期为 \(2\pi\) 的函数 \(f\)，在等分点上的离散内积定义为
+\[
+\langle f, g \rangle_N = \frac{1}{N} \sum_{k=0}^{N-1} f\!\left( \frac{2\pi k}{N} \right) \overline{g\!\left( \frac{2\pi k}{N} \right)},
+\]
+并取 \(E_j(x) = e^{ijx}\)。则对于 \(N=2n\)，采样点为 \(x_k = \pi k / n\)，\(k=0,1,\dots,2n-1\)。
+
+首先计算 \(\langle f, E_j \rangle_{2n}\)：
+\[
+\langle f, E_j \rangle_{2n} = \frac{1}{2n} \sum_{k=0}^{2n-1} f\!\left( \frac{\pi k}{n} \right) e^{-ij\pi k/n}.
+\]
+将求和按 \(k\) 的奇偶性分解：
+\[
+\begin{aligned}
+\langle f, E_j \rangle_{2n} &= \frac{1}{2n} \sum_{m=0}^{n-1} f\!\left( \frac{2\pi m}{n} \right) e^{-ij2\pi m/n} \\
+&\quad + \frac{1}{2n} \sum_{m=0}^{n-1} f\!\left( \frac{\pi(2m+1)}{n} \right) e^{-ij\pi(2m+1)/n}.
+\end{aligned}
+\]
+第一项即 \(\frac{1}{2} \langle f, E_j \rangle_n = \frac{u_j}{2}\)。第二项中，
+\[
+e^{-ij\pi(2m+1)/n} = e^{-ij\pi/n} e^{-ij2\pi m/n},
+\]
+且 \(f(\pi(2m+1)/n) = f(2\pi m/n + \pi/n) = (T_{\pi/n}f)(2\pi m/n)\)，故
+\[
+\frac{1}{2n} \sum_{m=0}^{n-1} (T_{\pi/n}f)(2\pi m/n) e^{-ij\pi/n} e^{-ij2\pi m/n}
+= \frac{1}{2} e^{-ij\pi/n} \langle T_{\pi/n}f, E_j \rangle_n = \frac{v_j}{2}.
+\]
+因此 \(\langle f, E_j \rangle_{2n} = \frac{1}{2}(u_j + v_j)\)。
+
+再计算 \(\langle f, E_{j+n} \rangle_{2n}\)。由于 \(E_{j+n}(x)=e^{i(j+n)x}=e^{ijx}e^{inx}\)，在 \(x_k=\pi k/n\) 处有 \(e^{inx_k}=e^{i\pi k}=(-1)^k\)，故
+\[
+\langle f, E_{j+n} \rangle_{2n} = \frac{1}{2n} \sum_{k=0}^{2n-1} f\!\left( \frac{\pi k}{n} \right) e^{-ij\pi k/n} (-1)^k.
+\]
+分离奇偶项：
+\[
+\begin{aligned}
+\langle f, E_{j+n} \rangle_{2n} &= \frac{1}{2n} \sum_{m=0}^{n-1} f\!\left( \frac{2\pi m}{n} \right) e^{-ij2\pi m/n} \\
+&\quad - \frac{1}{2n} \sum_{m=0}^{n-1} f\!\left( \frac{\pi(2m+1)}{n} \right) e^{-ij\pi(2m+1)/n} \\
+&= \frac{1}{2} \langle f, E_j \rangle_n - \frac{1}{2} e^{-ij\pi/n} \langle T_{\pi/n}f, E_j \rangle_n = \frac{1}{2}(u_j - v_j).
+\end{aligned}
+\]
+
+
+\end{document}

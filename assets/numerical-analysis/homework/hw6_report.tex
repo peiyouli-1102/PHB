@@ -1,0 +1,353 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[UTF8]{ctex}          % 中文支持
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}     % 数学符号
+\usepackage{listings}            % 代码排版
+\usepackage{xcolor}              % 颜色
+\usepackage{geometry}            % 页面边距
+\usepackage{hyperref}            % 超链接（可选，用于交叉引用）
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+% MATLAB 代码样式
+\lstset{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    escapeinside={\%*}{*)},
+    morekeywords={u,v,w,RichardsonExtrapolation}
+}
+
+\title{第六周上机作业}
+\author{PB23000270李佩优}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{基于 Richardson 外推的数值微分}
+
+\subsection{程序概述}
+
+程序 \texttt{hw6\_1.m} 使用 Richardson 外推法计算一阶导数的数值近似。测试函数为：
+\[
+u(x)=\ln x,\qquad v(x)=\tan x,\qquad w(x)=\sin\left(x^2+\frac{x}{3}\right)
+\]
+在指定点 \(x\) 及参数 \(M, h\) 下输出外推表格，并返回最高精度近似值。
+
+\subsection{算法原理}
+
+\subsubsection{中心差分公式}
+一阶导数的中心差分（步长 \(h\)）为
+\[
+D(h)=\frac{f(x+h)-f(x-h)}{2h}
+\]
+其误差展开仅含 \(h\) 的偶次幂：
+\[
+D(h)=f'(x)+c_2h^2+c_4h^4+c_6h^6+\cdots
+\]
+
+\subsubsection{Richardson 外推思想}
+通过组合不同步长的差分值逐阶消去低次幂误差项。记 \(D_{k,1}=D(h/2^k)\) 为初始列，递推公式为
+\[
+D_{k,m}=D_{k,m-1}+\frac{D_{k,m-1}-D_{k-1,m-1}}{4^{m-1}-1},\quad (m\ge 2,\; k\ge m)
+\]
+其中 \(m\) 表示已消去 \(h^{2(m-1)}\) 项。最终 \(D_{M+1,M+1}\) 为最佳近似。
+
+\subsubsection{算法步骤}
+\begin{enumerate}
+    \item 建立 \((M+1)\times(M+1)\) 零矩阵 \(D\)。
+    \item 计算第 1 列：对 \(k=1,\dots,M+1\)，令步长 \(\text{step}=h/2^{k}\)，
+    \[
+    D(k,1)=\frac{f(x+\text{step})-f(x-\text{step})}{2\cdot\text{step}}
+    \]
+    \item 外推递推：预计算 \(4^{1},\dots,4^{M+1}\)，对 \(m=2\) 至 \(M+1\)，对 \(k=m\) 至 \(M+1\)，按上述公式计算 \(D(k,m)\)。
+    \item 输出下三角表格并返回 \(D(M+1,M+1)\)。
+\end{enumerate}
+
+\subsection{程序结构说明}
+
+\begin{lstlisting}[caption={hw6\_1.m 程序结构}, label={lst:code}]
+clear; close all;
+
+% 定义测试函数
+u = @(x) log(x);
+v = @(x) tan(x);
+w = @(x) sin(x^2 + 1/3*x);
+
+% 调用外推函数
+RichardsonExtrapolation(u, 3, 3, 1);
+RichardsonExtrapolation(v, asin(0.8), 4, 1);
+RichardsonExtrapolation(w, 0, 5, 1);
+
+function f_1 = RichardsonExtrapolation(f, x, M, h)
+    % 输入：f-函数句柄, x-求导点, M-外推阶数, h-初始步长
+    % 输出：f_1-最优导数近似值，同时打印外推表
+    ...
+end
+\end{lstlisting}
+
+\subsection{数值结果与分析}
+
+程序在北太天元上运行良好
+
+\subsubsection{测试函数 1：\(u(x)=\ln x\)，\(x=3\)，\(M=3\)，\(h=1\)}
+理论导数 \(u'(3)=1/3\approx 0.3333333333\)。外推表（保留四位小数）见附录表~\ref{tab:extrap1}。随着外推阶数增加，数值迅速稳定于 \(0.3333\)。
+
+\subsubsection{测试函数 2：\(v(x)=\tan x\)，\(x=\arcsin(0.8)\)，\(M=4\)，\(h=1\)}
+\(x=\arcsin(0.8)\approx 0.927295\)，理论导数 \(v'(x)=\sec^2 x=25/9\approx 2.77777778\)。外推表见附录表~\ref{tab:extrap2}。最终结果与真值高度吻合。
+
+\subsubsection{测试函数 3：\(w(x)=\sin(x^2+x/3)\)，\(x=0\)，\(M=5\)，\(h=1\)}
+理论导数 \(w'(0)=\cos(0)\cdot\frac{1}{3}=1/3\approx 0.3333333333\)。外推表见附录表~\ref{tab:extrap3}。外推效果极佳，高阶项均稳定于 \(0.3333\)。
+
+
+\section{复化梯形与 Simpson 积分及收敛性分析}
+
+\subsection{程序概述}
+
+程序 \texttt{hw6\_2.m} 实现了复化梯形公式与复化 Simpson 公式，用于计算积分
+\[
+I_1 = \int_0^4 \sin x \, dx,\qquad
+I_2 = \int_0^{2\pi} \sin x \, dx.
+\]
+取 \(N=2,4,\dots,4096\)（即 \(2^k, k=1,\dots,12\)），计算近似值、绝对误差及数值收敛阶，并绘制双对数误差图。
+
+\subsection{算法说明}
+
+\subsubsection{复化梯形公式}
+将 \([a,b]\) 等分为 \(N\) 份，步长 \(h=(b-a)/N\)，
+\[
+T_N = \frac{h}{2}\Bigl[f(x_0)+2\sum_{i=1}^{N-1}f(x_i)+f(x_N)\Bigr].
+\]
+误差满足 \(E_T = -\frac{(b-a)h^2}{12}f''(\xi)\)，理论收敛阶为 \(2\)。
+
+\subsubsection{复化 Simpson 公式}
+要求 \(N\) 为偶数，
+\[
+S_N = \frac{h}{3}\Bigl[f(x_0)+4\!\!\sum_{i\ \text{odd}}^{N-1}\!f(x_i)+2\!\!\sum_{i\ \text{even}}^{N-2}\!f(x_i)+f(x_N)\Bigr].
+\]
+误差满足 \(E_S = -\frac{(b-a)h^4}{180}f^{(4)}(\xi)\)，理论收敛阶为 \(4\)。
+
+\subsubsection{收敛阶估计}
+利用两次细分误差比值估计阶数：
+\[
+p \approx \frac{\log(E_{h_1}/E_{h_2})}{\log(N_2/N_1)}.
+\]
+
+\subsection{程序结构说明}
+
+核心循环计算不同 \(N\) 下的积分值，并调用子函数：
+\begin{itemize}
+    \item \texttt{CompTrapezoidal(f,a,b,N)}：复化梯形积分。
+    \item \texttt{CompSimpson(f,a,b,N)}：复化 Simpson 积分，强制 \(N\) 为偶数。
+\end{itemize}
+
+\subsection{数值结果与误差分析}
+
+该程序在北太天元上运行良好
+
+\subsubsection{积分 \(I_1 = \int_0^4 \sin x\,dx\)}
+真值 \(I_1 = 1-\cos 4 \approx 1.653643620864\)。近似值及误差见附录表~\ref{tab:I1}，收敛阶估计见表~\ref{tab:I1_order}。
+\textbf{分析：} 梯形法收敛阶稳定于 2.0，Simpson 法稳定于 4.0，与理论吻合。相同 \(N\) 下 Simpson 法精度显著更高。
+
+\subsubsection{积分 \(I_2 = \int_0^{2\pi} \sin x\,dx\)}
+真值 \(I_2 = 0\)（精确为零）。近似值及误差见附录表~\ref{tab:I2}，收敛阶估计见表~\ref{tab:I2_order}。
+\textbf{分析：} 真值为零，截断误差本应为零，实际误差由浮点舍入误差主导，保持在 \(10^{-16}\) 量级。收敛阶因误差随机波动而失去意义。
+
+\subsection{误差收敛图}
+
+图~\ref{fig:error} 为双对数误差图。对于 \(I_1\)，直线斜率分别约为 \(-2\)（梯形）和 \(-4\)（Simpson）；对于 \(I_2\)，误差在机器精度附近波动。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{6_2.png}
+\caption{复化梯形与 Simpson 积分误差收敛行为}
+\label{fig:error}
+\end{figure}
+
+\subsection{总结}
+数值实验验证了复化梯形公式（二阶收敛）与复化 Simpson 公式（四阶收敛）的理论收敛速率。对于光滑函数，细分区间能有效降低截断误差；当误差接近机器精度时，舍入误差占主导，继续增加 \(N\) 不再提升精度。
+
+\newpage
+\appendix
+\section{数值结果表}
+
+\subsection{复化求积结果表}
+
+\begin{table}[htbp]
+\centering
+\caption{积分 \(I_1 = \int_0^4 \sin x\,dx\) 计算结果}
+\label{tab:I1}
+\begin{tabular}{c c c c c c}
+\toprule
+\(k\) & \(N\) & 梯形近似值 & 梯形误差 & Simpson 近似值 & Simpson 误差 \\
+\midrule
+1 & 2 & 1.061792358343 & 5.9185e-01 & 1.920258141330 & 2.6661e-01 \\
+2 & 4 & 1.513487172039 & 1.4016e-01 & 1.664052109938 & 1.0408e-02 \\
+3 & 8 & 1.619048306831 & 3.4595e-02 & 1.654235351762 & 5.9173e-04 \\
+4 & 16 & 1.645021908709 & 8.6217e-03 & 1.653679776002 & 3.6155e-05 \\
+5 & 32 & 1.651489878133 & 2.1537e-03 & 1.653645867940 & 2.2471e-06 \\
+6 & 64 & 1.653105290366 & 5.3833e-04 & 1.653643761110 & 1.4025e-07 \\
+7 & 128 & 1.653509044811 & 1.3458e-04 & 1.653643629626 & 8.7623e-09 \\
+8 & 256 & 1.653609977261 & 3.3644e-05 & 1.653643621411 & 5.4760e-10 \\
+9 & 512 & 1.653635209989 & 8.4109e-06 & 1.653643620898 & 3.4224e-11 \\
+10 & 1024 & 1.653641518146 & 2.1027e-06 & 1.653643620866 & 2.1390e-12 \\
+11 & 2048 & 1.653643095184 & 5.2568e-07 & 1.653643620864 & 1.3411e-13 \\
+12 & 4096 & 1.653643489444 & 1.3142e-07 & 1.653643620864 & 8.2157e-15 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{积分 \(I_1\) 收敛阶估计}
+\label{tab:I1_order}
+\begin{tabular}{c c c c}
+\toprule
+\(k\) & \(N_{\text{old}}\to N_{\text{new}}\) & 梯形收敛阶 & Simpson 收敛阶 \\
+\midrule
+2 & 2 \(\to\) 4 & 2.078 & 4.679 \\
+3 & 4 \(\to\) 8 & 2.018 & 4.137 \\
+4 & 8 \(\to\) 16 & 2.005 & 4.033 \\
+5 & 16 \(\to\) 32 & 2.001 & 4.008 \\
+6 & 32 \(\to\) 64 & 2.000 & 4.002 \\
+7 & 64 \(\to\) 128 & 2.000 & 4.001 \\
+8 & 128 \(\to\) 256 & 2.000 & 4.000 \\
+9 & 256 \(\to\) 512 & 2.000 & 4.000 \\
+10 & 512 \(\to\) 1024 & 2.000 & 4.000 \\
+11 & 1024 \(\to\) 2048 & 2.000 & 3.995 \\
+12 & 2048 \(\to\) 4096 & 2.000 & 4.029 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{积分 \(I_2 = \int_0^{2\pi} \sin x\,dx\) 计算结果}
+\label{tab:I2}
+\begin{tabular}{c c c c c c}
+\toprule
+\(k\) & \(N\) & 梯形近似值 & 梯形误差 & Simpson 近似值 & Simpson 误差 \\
+\midrule
+1 & 2 & 0 & 0.0000e+00 & 2.5649e-16 & 2.5649e-16 \\
+2 & 4 & 1.5642e-16 & 1.5642e-16 & 0 & 0.0000e+00 \\
+3 & 8 & -2.7058e-16 & 2.7058e-16 & -1.8038e-16 & 1.8038e-16 \\
+4 & 16 & -9.1690e-17 & 9.1690e-17 & 1.4233e-16 & 1.4233e-16 \\
+5 & 32 & 4.1739e-16 & 4.1739e-16 & -2.3297e-17 & 2.3297e-17 \\
+6 & 64 & 5.6889e-18 & 5.6889e-18 & 4.2849e-17 & 4.2849e-17 \\
+7 & 128 & -1.0439e-17 & 1.0439e-17 & -3.0348e-17 & 3.0348e-17 \\
+8 & 256 & 2.0119e-16 & 2.0119e-16 & -1.4063e-16 & 1.4063e-16 \\
+9 & 512 & 7.7328e-17 & 7.7328e-17 & -1.1565e-16 & 1.1565e-16 \\
+10 & 1024 & 3.2197e-17 & 3.2197e-17 & 1.5451e-17 & 1.5451e-17 \\
+11 & 2048 & 1.8377e-16 & 1.8377e-16 & -4.6254e-17 & 4.6254e-17 \\
+12 & 4096 & 1.8729e-16 & 1.8729e-16 & 1.4899e-17 & 1.4899e-17 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{积分 \(I_2\) 收敛阶估计}
+\label{tab:I2_order}
+\begin{tabular}{c c c c}
+\toprule
+\(k\) & \(N_{\text{old}}\to N_{\text{new}}\) & 梯形收敛阶 & Simpson 收敛阶 \\
+\midrule
+2 & 2 \(\to\) 4 & -Inf & Inf \\
+3 & 4 \(\to\) 8 & -0.791 & -Inf \\
+4 & 8 \(\to\) 16 & 1.561 & 0.342 \\
+5 & 16 \(\to\) 32 & -2.187 & 2.611 \\
+6 & 32 \(\to\) 64 & 6.197 & -0.879 \\
+7 & 64 \(\to\) 128 & -0.876 & 0.498 \\
+8 & 128 \(\to\) 256 & -4.268 & -2.212 \\
+9 & 256 \(\to\) 512 & 1.380 & 0.282 \\
+10 & 512 \(\to\) 1024 & 1.264 & 2.904 \\
+11 & 1024 \(\to\) 2048 & -2.513 & -1.582 \\
+12 & 2048 \(\to\) 4096 & -0.027 & 1.634 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+\subsection{外推法数值微分结果表}
+
+\begin{table}[htbp]
+\centering
+\caption{\(u(x)=\ln x\) 在 \(x=3\) 处的外推表}
+\label{tab:extrap1}
+\begin{tabular}{c*{4}{c}}
+\toprule
+\(k\) & \multicolumn{4}{c}{外推值 \(D(k,m)\)} \\
+\midrule
+1 & 0.3365 & & & \\
+2 & 0.3341 & 0.3333 & & \\
+3 & 0.3335 & 0.3333 & 0.3333 & \\
+4 & 0.3334 & 0.3333 & 0.3333 & 0.3333 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{\(v(x)=\tan x\) 在 \(x=\arcsin(0.8)\) 处的外推表}
+\label{tab:extrap2}
+\begin{tabular}{c*{5}{c}}
+\toprule
+\(k\) & \multicolumn{5}{c}{外推值 \(D(k,m)\)} \\
+\midrule
+1 & 6.4653 & & & & \\
+2 & 3.2091 & 2.1237 & & & \\
+3 & 2.8730 & 2.7609 & 2.8034 & & \\
+4 & 2.8009 & 2.7769 & 2.7779 & 2.7775 & \\
+5 & 2.7835 & 2.7777 & 2.7778 & 2.7778 & 2.7778 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{\(w(x)=\sin(x^2+x/3)\) 在 \(x=0\) 处的外推表}
+\label{tab:extrap3}
+\begin{tabular}{c*{6}{c}}
+\toprule
+\(k\) & \multicolumn{6}{c}{外推值 \(D(k,m)\)} \\
+\midrule
+1 & 0.3215 & & & & & \\
+2 & 0.3323 & 0.3359 & & & & \\
+3 & 0.3332 & 0.3335 & 0.3333 & & & \\
+4 & 0.3333 & 0.3333 & 0.3333 & 0.3333 & & \\
+5 & 0.3333 & 0.3333 & 0.3333 & 0.3333 & 0.3333 & \\
+6 & 0.3333 & 0.3333 & 0.3333 & 0.3333 & 0.3333 & 0.3333 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+\section{计算机代码}
+
+\small
+\hrule
+\verbatiminput{hw6_1.m}
+\verbatiminput{hw6_2.m}
+\hrule
+
+\end{document}

@@ -1,0 +1,327 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage[UTF8]{ctex}
+
+\newtheorem{problem}{问题}
+\newtheorem{solution}{解答}
+\title{数值分析第十周作业}
+\date{\today}
+\author{李佩优PB23000270}
+\geometry{a4paper,scale=0.8}
+
+\begin{document}
+\maketitle
+
+\section*{8.3}
+\subsection*{5}
+
+推导三阶龙格-库塔公式
+
+\[
+x(t+h) = x(t) + \frac{1}{9}(2F_1 + 3F_2 + 4F_3)
+\]
+
+其中
+
+\[
+\begin{cases} 
+F_1 = hf(t,x) \\[4pt]
+F_2 = hf\!\left(t+\frac{1}{2}h,\; x + \frac{1}{2}F_1\right) \\[4pt]
+F_3 = hf\!\left(t+\frac{3}{4}h,\; x + \frac{3}{4}F_2\right)
+\end{cases}
+\]
+
+说明它与微分方程 \(x' = x + t\) 的三阶泰勒级数方法一致。
+
+
+
+给定三阶显式龙格-库塔公式
+\begin{equation}\label{eq:rk3}
+x(t+h) = x(t) + \frac{1}{9}(2F_1 + 3F_2 + 4F_3),
+\end{equation}
+其中
+\[
+\begin{cases}
+F_1 = h f(t,x), \\[4pt]
+F_2 = h f\!\left(t+\dfrac{1}{2}h,\; x + \dfrac{1}{2}F_1\right), \\[10pt]
+F_3 = h f\!\left(t+\dfrac{3}{4}h,\; x + \dfrac{3}{4}F_2\right).
+\end{cases}
+\]
+
+现说明该公式应用于微分方程 $x' = x + t$ 时，与三阶泰勒级数方法一致。
+
+\subsubsection*{龙格-库塔公式计算 $x(t+h)$}
+
+对于方程 $x' = x + t$，有 $f(t,x) = x + t$。依次计算 $F_1, F_2, F_3$：
+\[
+F_1 = h(x + t).
+\]
+\[
+\begin{aligned}
+F_2 &= h f\!\left(t+\frac{h}{2},\; x + \frac{F_1}{2}\right) 
+     = h\left[ \left(x + \frac{h(x+t)}{2}\right) + \left(t + \frac{h}{2}\right) \right] \\
+    &= h\left[ x + t + \frac{h}{2}(x + t + 1) \right] \\
+    &= h(x+t) + \frac{h^2}{2}(x+t+1).
+\end{aligned}
+\]
+\[
+\begin{aligned}
+F_3 &= h f\!\left(t+\frac{3h}{4},\; x + \frac{3F_2}{4}\right) \\
+    &= h\left[ \left(x + \frac{3}{4}\Bigl[h(x+t) + \frac{h^2}{2}(x+t+1)\Bigr]\right) + \left(t + \frac{3h}{4}\right) \right] \\
+    &= h\left[ x + t + \frac{3h}{4}(x+t) + \frac{3h^2}{8}(x+t+1) + \frac{3h}{4} \right] \\
+    &= h(x+t) + \frac{3h^2}{4}(x+t+1) + \frac{3h^3}{8}(x+t+1).
+\end{aligned}
+\]
+
+代入 \eqref{eq:rk3}：
+\[
+\begin{aligned}
+x(t+h) &= x + \frac{1}{9}\Bigl(2F_1 + 3F_2 + 4F_3\Bigr) \\
+       &= x + \frac{1}{9}\biggl[ 2h(x+t) \\
+       &\quad + 3\Bigl(h(x+t) + \frac{h^2}{2}(x+t+1)\Bigr) \\
+       &\quad + 4\Bigl(h(x+t) + \frac{3h^2}{4}(x+t+1) + \frac{3h^3}{8}(x+t+1)\Bigr) \biggr] \\
+       &= x + \frac{1}{9}\biggl[ (2+3+4)h(x+t) \\
+       &\qquad\qquad + \Bigl(\frac{3}{2} + 3\Bigr)h^2(x+t+1) \\
+       &\qquad\qquad + \frac{3}{2}h^3(x+t+1) \biggr] \\
+       &= x + h(x+t) + \frac{1}{9}\left[ \frac{9}{2}h^2(x+t+1) + \frac{3}{2}h^3(x+t+1) \right] \\
+       &= x + h(x+t) + \frac{h^2}{2}(x+t+1) + \frac{h^3}{6}(x+t+1).
+\end{aligned}
+\]
+
+\subsubsection*{泰勒级数方法计算 $x(t+h)$}
+
+由方程 $x' = x + t$，逐次求导：
+\[
+\begin{aligned}
+x'    &= x + t, \\
+x''   &= x' + 1 = x + t + 1, \\
+x'''  &= x'' = x + t + 1.
+\end{aligned}
+\]
+在 $t$ 处的三阶泰勒展开为
+\[
+\begin{aligned}
+x(t+h) &= x(t) + h x'(t) + \frac{h^2}{2} x''(t) + \frac{h^3}{6} x'''(t) + O(h^4) \\
+       &= x + h(x+t) + \frac{h^2}{2}(x+t+1) + \frac{h^3}{6}(x+t+1) + O(h^4).
+\end{aligned}
+\]
+
+
+比较两种方法所得的 $x(t+h)$ 表达式，它们直到 $h^3$ 项完全相同。因此该三阶龙格-库塔公式与三阶泰勒级数方法一致。
+
+\subsection*{6}
+证明:当四阶龙格-库塔方法应用于问题 \(x' = \lambda x\) 时，步进求解的公式将是
+
+\[
+x(t + h) = \left[1 + h\lambda + \frac{1}{2}h^2\lambda^2 + \frac{1}{6}h^3\lambda^3 + \frac{1}{24}h^4\lambda^4\right] x(t)
+\]
+
+
+
+经典四阶龙格-库塔方法为
+\[
+\begin{cases}
+F_1 = h f(t, x), \\[4pt]
+F_2 = h f\!\left(t + \dfrac{h}{2},\; x + \dfrac{F_1}{2}\right), \\[10pt]
+F_3 = h f\!\left(t + \dfrac{h}{2},\; x + \dfrac{F_2}{2}\right), \\[10pt]
+F_4 = h f(t + h,\; x + F_3), \\[8pt]
+x(t+h) = x(t) + \dfrac{1}{6}(F_1 + 2F_2 + 2F_3 + F_4).
+\end{cases}
+\]
+
+对于 $x' = \lambda x$，有 $f(t,x) = \lambda x$。令 $z = h\lambda$，逐步计算：
+\[
+F_1 = h\lambda x = z x.
+\]
+\[
+\begin{aligned}
+F_2 &= h\lambda\left(x + \frac{F_1}{2}\right) 
+    = h\lambda x\left(1 + \frac{z}{2}\right) 
+    = x z\left(1 + \frac{z}{2}\right).
+\end{aligned}
+\]
+\[
+\begin{aligned}
+F_3 &= h\lambda\left(x + \frac{F_2}{2}\right) 
+    = h\lambda x\left[1 + \frac{z}{2}\left(1 + \frac{z}{2}\right)\right] \\
+    &= x z\left(1 + \frac{z}{2} + \frac{z^2}{4}\right).
+\end{aligned}
+\]
+\[
+\begin{aligned}
+F_4 &= h\lambda(x + F_3) 
+    = h\lambda x\left[1 + z\left(1 + \frac{z}{2} + \frac{z^2}{4}\right)\right] \\
+    &= x z\left(1 + z + \frac{z^2}{2} + \frac{z^3}{4}\right).
+\end{aligned}
+\]
+
+将它们代入步进公式：
+\[
+\begin{aligned}
+x(t+h) &= x + \frac{1}{6}\Bigl(F_1 + 2F_2 + 2F_3 + F_4\Bigr) \\
+       &= x + \frac{x}{6}\biggl[ z + 2z\left(1 + \frac{z}{2}\right) 
+           + 2z\left(1 + \frac{z}{2} + \frac{z^2}{4}\right) \\
+       &\qquad\qquad\; + z\left(1 + z + \frac{z^2}{2} + \frac{z^3}{4}\right) \biggr] \\
+       &= x\biggl[ 1 + \frac{1}{6}\Bigl( (1+2+2+1)z \\
+       &\qquad\qquad\quad + \bigl(1 + 1 + \tfrac{1}{2}\cdot2? \text{重新整理} \bigr) \cdots \biggr].
+\end{aligned}
+\]
+合并同类项：
+\begin{align*}
+F_1 &= z x,\\
+2F_2 &= 2x z\left(1 + \frac{z}{2}\right) = x\left(2z + z^2\right),\\
+2F_3 &= 2x z\left(1 + \frac{z}{2} + \frac{z^2}{4}\right) = x\left(2z + z^2 + \frac{z^3}{2}\right),\\
+F_4 &= x z\left(1 + z + \frac{z^2}{2} + \frac{z^3}{4}\right) = x\left(z + z^2 + \frac{z^3}{2} + \frac{z^4}{4}\right).
+\end{align*}
+求和：
+\[
+\begin{aligned}
+F_1 + 2F_2 + 2F_3 + F_4 
+&= x\bigl[ (1+2+2+1)z \\
+&\qquad + (0+1+1+1)z^2 \\
+&\qquad + \left(0+0+\tfrac{1}{2}+\tfrac{1}{2}\right)z^3 \\
+&\qquad + \left(0+0+0+\tfrac{1}{4}\right)z^4 \bigr] \\
+&= x\left( 6z + 3z^2 + z^3 + \frac{1}{4}z^4 \right).
+\end{aligned}
+\]
+因此
+\[
+\begin{aligned}
+x(t+h) &= x + \frac{1}{6} \cdot x\left( 6z + 3z^2 + z^3 + \frac{1}{4}z^4 \right) \\
+       &= x\left( 1 + z + \frac{1}{2}z^2 + \frac{1}{6}z^3 + \frac{1}{24}z^4 \right).
+\end{aligned}
+\]
+将 $z = h\lambda$ 代回，即得
+\[
+x(t+h) = \left[1 + h\lambda + \frac{1}{2}h^2\lambda^2 + \frac{1}{6}h^3\lambda^3 + \frac{1}{24}h^4\lambda^4\right] x(t).
+\]
+这正是所要证明的公式。
+
+
+\section*{8.4}
+
+\subsection*{12}
+
+
+已知线性多步法公式
+\[
+x_{n+1} = (1 - A)x_n + A x_{n-1} 
++ \frac{h}{12}\bigl[(5 - A)x'_{n+1} + 8(1 + A)x'_n + (5A - 1)x'_{n-1}\bigr],
+\]
+其中 $x'_k = f(t_k, x_k)$，且它对\textbf{一切} $A$ 的次数不超过 $m$ 的多项式均精确成立。
+试确定 $A$ 使它对一切 $m+1$ 次多项式也精确成立，并求出 $A$ 和 $m$。
+
+\subsubsection*{解}
+不失一般性，取 $t_n = 0, \; h = 1$，则 $t_{n-1} = -1,\; t_{n+1} = 1$。
+设 $x(t) = t^k$，此时 $x'(t) = k t^{k-1}$。公式化为
+\[
+1^k = (1 - A) \cdot 0^k + A \cdot (-1)^k 
++ \frac{1}{12}\Bigl[ (5 - A) k \cdot 1^{k-1} + 8(1 + A) k \cdot 0^{k-1} 
++ (5A - 1) k \cdot (-1)^{k-1} \Bigr].
+\]
+依次检验 $k = 0,1,2,3,4,\dots$：
+
+\begin{itemize}
+\item $k = 0$：$x(t) = 1,\; x'(t) = 0$。
+左端 $= 1$，右端 $= (1 - A) \cdot 1 + A \cdot 1 + 0 = 1$。\quad 对一切 $A$ 精确成立。
+
+\item $k = 1$：$x(t) = t,\; x'(t) = 1$。
+左端 $= 1$，右端 $= (1 - A) \cdot 0 + A \cdot (-1) + \frac{1}{12}\bigl[(5 - A) \cdot 1 + 8(1 + A) \cdot 1 + (5A - 1) \cdot 1\bigr]$ \\
+$= -A + \frac{1}{12}(5 - A + 8 + 8A + 5A - 1) = -A + \frac{1}{12}(12 + 12A) = -A + 1 + A = 1$。\quad 对一切 $A$ 精确成立。
+
+\item $k = 2$：$x(t) = t^2,\; x'(t) = 2t$。
+左端 $= 1$，右端 $= (1 - A) \cdot 0 + A \cdot 1 + \frac{1}{12}\bigl[(5 - A) \cdot 2 + 0 + (5A - 1) \cdot (-2)\bigr]$ \\
+$= A + \frac{1}{12}(10 - 2A - 10A + 2) = A + \frac{1}{12}(12 - 12A) = A + 1 - A = 1$。\quad 对一切 $A$ 精确成立。
+
+\item $k = 3$：$x(t) = t^3,\; x'(t) = 3t^2$。
+左端 $= 1$，右端 $= (1 - A) \cdot 0 + A \cdot (-1)^3 + \frac{1}{12}\bigl[(5 - A) \cdot 3 + 0 + (5A - 1) \cdot 3\bigr]$ \\
+$= -A + \frac{1}{12}(15 - 3A + 15A - 3) = -A + \frac{1}{12}(12 + 12A) = -A + 1 + A = 1$。\quad 对一切 $A$ 精确成立。
+
+\item $k = 4$：$x(t) = t^4,\; x'(t) = 4t^3$。
+左端 $= 1$，右端 $= (1 - A) \cdot 0 + A \cdot 1 + \frac{1}{12}\bigl[(5 - A) \cdot 4 + 0 + (5A - 1) \cdot (-4)\bigr]$ \\
+$= A + \frac{1}{12}(20 - 4A - 20A + 4) = A + \frac{1}{12}(24 - 24A) = A + 2 - 2A = 2 - A$。
+令左端等于右端：$1 = 2 - A \;\Longrightarrow\; A = 1$。
+\end{itemize}
+
+由此可见，对任意 $A$，公式对次数 $\le 3$ 的多项式均精确成立，故 $m = 3$。
+当 $A = 1$ 时，对 $4$ 次多项式也精确成立。代入 $A = 1$ 验算 $k = 5$ 可知不再精确，因此方法的最高可达阶数为 $m+1 = 4$。
+
+$\Rightarrow$ $m = 3$，$A = 1$。
+
+\subsection*{17}
+
+确定下列线性多步法的阶：
+\[
+x_n = x_{n-3} + \frac{3}{8} h\bigl[f_n + 3f_{n-1} + 3f_{n-2} + f_{n-3}\bigr],
+\]
+其中 $f_k = f(t_k, x_k) = x'(t_k)$。要求通过计算 $d_0, d_1, \ldots$（泰勒展开的系数）来完成。
+
+\subsubsection*{解}
+将公式写成截断误差算子的形式。设 $t = t_{n-3}$，则 $t_n = t + 3h$，
+$x_n = x(t + 3h)$，$x_{n-3} = x(t)$，$f_n = x'(t + 3h)$，$f_{n-1} = x'(t + 2h)$，
+$f_{n-2} = x'(t + h)$，$f_{n-3} = x'(t)$。定义算子
+\[
+\mathcal{L}[x(t); h] = x(t+3h) - x(t) 
+- \frac{3}{8}h\Bigl[x'(t+3h) + 3x'(t+2h) + 3x'(t+h) + x'(t)\Bigr].
+\]
+将各项在 $t$ 处展开为泰勒级数：
+\begin{align*}
+x(t+3h) &= x + 3h x' + \frac{9h^2}{2} x'' + \frac{27h^3}{6} x''' + \frac{81h^4}{24} x'''' + \frac{243h^5}{120} x''''' + \cdots,\\
+x'(t+3h) &= x' + 3h x'' + \frac{9h^2}{2} x''' + \frac{27h^3}{6} x'''' + \frac{81h^4}{24} x''''' + \cdots,\\
+x'(t+2h) &= x' + 2h x'' + \frac{4h^2}{2} x''' + \frac{8h^3}{6} x'''' + \frac{16h^4}{24} x''''' + \cdots,\\
+x'(t+h) &= x' + h x'' + \frac{h^2}{2} x''' + \frac{h^3}{6} x'''' + \frac{h^4}{24} x''''' + \cdots,\\
+x'(t) &= x'.
+\end{align*}
+
+首先计算括号内的组合：
+\begin{align*}
+&\quad x'(t+3h) + 3x'(t+2h) + 3x'(t+h) + x'(t)\\
+&= (1+3+3+1)x' \\
+&\quad + \bigl(3 + 3\cdot 2 + 3\cdot 1\bigr)h x'' 
+   + \Bigl(\frac{9}{2} + 3\cdot\frac{4}{2} + 3\cdot\frac{1}{2}\Bigr)h^2 x''' \\
+&\quad + \Bigl(\frac{27}{6} + 3\cdot\frac{8}{6} + 3\cdot\frac{1}{6}\Bigr)h^3 x''''
+   + \Bigl(\frac{81}{24} + 3\cdot\frac{16}{24} + 3\cdot\frac{1}{24}\Bigr)h^4 x''''' + \cdots\\
+&= 8x' + 12h x'' + 12h^2 x''' + 9h^3 x'''' + \frac{11}{2}h^4 x''''' + \cdots
+\end{align*}
+
+乘以 $-\dfrac{3}{8}h$ 得到：
+\[
+-\frac{3}{8}h[\cdots] = -3h x' - \frac{9}{2}h^2 x'' - \frac{9}{2}h^3 x''' - \frac{27}{8}h^4 x'''' - \frac{33}{16}h^5 x''''' - \cdots
+\]
+
+再加上 $x(t+3h) - x(t)$ 的展开：
+\[
+x(t+3h) - x(t) = 3h x' + \frac{9}{2}h^2 x'' + \frac{9}{2}h^3 x''' + \frac{27}{8}h^4 x'''' + \frac{81}{40}h^5 x''''' + \cdots
+\]
+
+两式相加，逐阶合并：
+\begin{align*}
+\mathcal{L}[x; h] 
+&= (3h x' - 3h x') 
+   + \Bigl(\frac{9}{2}h^2 x'' - \frac{9}{2}h^2 x''\Bigr) \\
+&\quad + \Bigl(\frac{9}{2}h^3 x''' - \frac{9}{2}h^3 x'''\Bigr)
+   + \Bigl(\frac{27}{8}h^4 x'''' - \frac{27}{8}h^4 x''''\Bigr) \\
+&\quad + \Bigl(\frac{81}{40}h^5 x''''' - \frac{33}{16}h^5 x'''''\Bigr) + \cdots\\[4pt]
+&= 0 \cdot x + 0 \cdot h x' + 0 \cdot h^2 x'' + 0 \cdot h^3 x''' + 0 \cdot h^4 x''''
+   + \Bigl(\frac{81}{40} - \frac{33}{16}\Bigr)h^5 x''''' + \cdots
+\end{align*}
+计算五阶系数：
+\[
+\frac{81}{40} - \frac{33}{16} = \frac{324}{160} - \frac{330}{160} = -\frac{6}{160} = -\frac{3}{80} \neq 0.
+\]
+
+因此展开式可写为
+\[
+\mathcal{L}[x; h] = d_0 x + d_1 h x' + d_2 h^2 x'' + d_3 h^3 x''' + d_4 h^4 x'''' + d_5 h^5 x''''' + \cdots,
+\]
+其中
+\[
+d_0 = d_1 = d_2 = d_3 = d_4 = 0, \qquad d_5 = -\frac{3}{80} \neq 0.
+\]
+第一个非零系数为 $d_5$，故该方法的局部截断误差为 $O(h^5)$，方法的阶为 $4$。
+
+$\Rightarrow$该方法的阶为 $4$。（$d_0 = d_1 = d_2 = d_3 = d_4 = 0,\; d_5 = -3/80$）
+
+
+\end{document} 

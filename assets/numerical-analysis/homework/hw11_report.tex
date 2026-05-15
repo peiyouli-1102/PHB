@@ -1,0 +1,286 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{left=1.5cm,right=1.5cm,top=2.5cm,bottom=2.5cm}
+
+% 代码高亮设置
+\lstset{
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+}
+% MATLAB 样式
+\lstdefinestyle{matlabstyle}{
+    language=Matlab,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+}
+% Mathematica 样式
+\lstdefinestyle{mathstyle}{
+    language={},
+    keywordstyle={},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    morekeywords={Module, NSolve, Max, Abs, RegionPlot, ParametricPlot, Show, GraphicsRow},
+}
+
+\title{第十一周上机作业}
+\author{PB23000270 李佩优}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{基于 RKF45 的自适应方法求解初值问题}
+
+\subsection{问题描述}
+求解一阶常微分方程初值问题
+\begin{equation}\label{eq:ivp}
+    y' = e^{y x} + \cos(y - x), \qquad y(1) = 3.
+\end{equation}
+由于右端函数包含指数项 $e^{y x}$，解的增长非常剧烈，可能在有限区间内趋向无穷。要求使用自适应 Runge-Kutta-Fehlberg 4(5) 方法（RKF45）计算数值解，初值步长取 $h = 0.01$，局部误差容限 $\text{tol} = 10^{-8}$。步长调整采用 Fehlberg 推荐的第二种策略（即仅在接受当前步长时更新步长，并对放大/缩小倍数加以限制）。当解的绝对值超过 $10^{10}$（或出现无穷/非数）时终止计算，并给出解的存在区间。最后，程序允许用户输入区间内的某个 $x$ 值，通过线性插值返回对应的近似 $y$ 值。
+
+\subsection{数值方法}
+\subsubsection{RKF45 公式}
+RKF45 是一种嵌入式 Runge-Kutta 方法，通过一次计算 6 个阶段值得到一对 4 阶和 5 阶的近似解，利用二者之差估计局部截断误差。对于步长 $h$ 和当前点 $(x_n, y_n)$，计算公式为
+\begin{align*}
+    k_i &= f\Bigl(x_n + c_i h,\; y_n + h\sum_{j=1}^{i-1} a_{ij} k_j\Bigr), \quad i = 1,\dots,6,\\[2pt]
+    y_{n+1}^{(4)} &= y_n + h\sum_{i=1}^6 b_i^{(4)} k_i,\\[2pt]
+    y_{n+1}^{(5)} &= y_n + h\sum_{i=1}^6 b_i^{(5)} k_i.
+\end{align*}
+程序采用 Fehlberg 经典系数：
+\[
+\begin{aligned}
+c &= (0,\;\tfrac14,\;\tfrac38,\;\tfrac{12}{13},\;1,\;\tfrac12),\\
+a_{21} &= \tfrac14,\\
+a_{31} &= \tfrac{3}{32},\; a_{32} = \tfrac{9}{32},\\
+a_{41} &= \tfrac{1932}{2197},\; a_{42} = -\tfrac{7200}{2197},\; a_{43} = \tfrac{7296}{2197},\\
+a_{51} &= \tfrac{439}{216},\; a_{52} = -8,\; a_{53} = \tfrac{3680}{513},\; a_{54} = -\tfrac{845}{4104},\\
+a_{61} &= -\tfrac{8}{27},\; a_{62} = 2,\; a_{63} = -\tfrac{3544}{2565},\; a_{64} = \tfrac{1859}{4104},\; a_{65} = -\tfrac{11}{40},\\
+b^{(4)} &= (\tfrac{25}{216},\;0,\;\tfrac{1408}{2565},\;\tfrac{2197}{4104},\;-\tfrac15,\;0),\\
+b^{(5)} &= (\tfrac{16}{135},\;0,\;\tfrac{6656}{12825},\;\tfrac{28561}{56430},\;-\tfrac{9}{50},\;\tfrac{2}{55}).
+\end{aligned}
+\]
+4 阶解 $y_{n+1}^{(4)}$ 的精度较低，仅用于误差估计；实际推进采用 5 阶解 $y_{n+1}^{(5)}$。
+
+\subsubsection{步长控制策略（第二种策略）}
+令局部误差估计为 $\text{err} = |y_{n+1}^{(5)} - y_{n+1}^{(4)}|$。
+\begin{itemize}
+    \item 若 $\text{err} \le \text{tol}$，则接受步长，将 $y_{n+1}^{(5)}$ 作为新解，并计算新步长
+    \[
+    h_{\text{new}} = 0.9 \, h \left( \frac{\text{tol}}{\text{err}} \right)^{\!1/5},
+    \]
+    同时限制 $h_{\text{new}}$ 的放大不超过 $5h$，缩小不低于 $0.2h$。
+    \item 若 $\text{err} > \text{tol}$，则拒绝步长，用同样的公式缩小 $h$（同样限制至少为 $0.2h$），并重新计算当前步。
+\end{itemize}
+为了防止步长过小导致死循环，当 $h < \text{eps}$ 时强制退出。
+
+\subsection{程序实现}
+程序使用 MATLAB 编写，定义微分方程右端函数 \texttt{f(x,y)}，初始化 $x_0=1,\; y_0=3$，步长 $h=0.01$，容差 $\text{tol}=10^{-8}$。积分主循环中计算 6 个阶段，得到误差估计，按照上述策略调整步长；每接受一步便将 $(x, y)$ 存入数组。当 $|y| > 10^{10}$ 或出现非数/无穷时停止。最后输出解的存在区间 $[1, x_{\text{end}}]$，并提示用户输入 $x$ 进行线性插值。
+
+\subsection{数值结果与分析}
+在 MATLAB 中运行程序，输出结果为：
+\begin{verbatim}
+解的范围: [1, 1.045644]
+请输入一个介于上述范围的值: 1.0456
+插值结果 y(1.045600) = 9.5429836079
+\end{verbatim}
+计算表明，从 $x=1$ 出发仅推进了约 $0.0456$ 的长度，$y$ 便迅速增长到 $9.54$，随即超出阈值而终止。这是因为右端项 $e^{y x}$ 当 $y$ 和 $x$ 都增大时呈指数爆炸，使方程具有极强的“刚性”特征。自适应 RKF45 方法能够自动缩小步长以保持局部误差要求，但无法穿越解的奇点（或增长过快的区域），故在解溢出前安全终止。插值功能为用户提供了任意中间点上的近似值，方便进一步分析。
+
+\section{五阶 Adams-Bashforth 与 Adams-Moulton 的绝对稳定域}
+
+\subsection{理论背景}
+对于线性测试方程 $y' = \lambda y$（$\lambda \in \mathbb{C}$），记 $z = h\lambda$。线性多步法
+\[
+\sum_{j=0}^{k} \alpha_j y_{n+j} = h \sum_{j=0}^{k} \beta_j f_{n+j}
+\]
+的绝对稳定域由多项式
+\[
+\rho(\zeta) - z\,\sigma(\zeta) = 0, \qquad \rho(\zeta) = \sum_{j=0}^{k} \alpha_j \zeta^j,\quad \sigma(\zeta) = \sum_{j=0}^{k} \beta_j \zeta^j
+\]
+的所有根满足 $|\zeta| \le 1$ 的 $z$ 值构成。其边界可由 $\zeta = e^{i\theta}$ 代入得到参数曲线 $z = \rho(e^{i\theta}) / \sigma(e^{i\theta})$。
+
+\subsection{五阶 Adams 方法的生成多项式}
+\textbf{五阶 Adams-Bashforth（显式）}：
+\[
+\rho(\zeta) = \zeta^5 - \zeta^4,\qquad
+\sigma_{\text{AB}}(\zeta) = \frac{1901\zeta^4 - 2774\zeta^3 + 2616\zeta^2 - 1274\zeta + 251}{720}.
+\]
+\textbf{五阶 Adams-Moulton（隐式）}：
+\[
+\rho(\zeta) = \zeta^5 - \zeta^4,\qquad
+\sigma_{\text{AM}}(\zeta) = \frac{251\zeta^5 + 646\zeta^4 - 264\zeta^3 + 106\zeta^2 - 19\zeta}{720}.
+\]
+
+\subsection{程序实现}
+采用 Mathematica 绘制绝对稳定域。首先定义稳定性判别函数：对给定的复数 $z$，求解多项式 $\rho(\zeta) - z\,\sigma(\zeta) = 0$ 的所有根，若最大模长不超过 $1+10^{-6}$ 则认为 $z$ 在稳定域内。然后利用 \texttt{RegionPlot} 进行区域填充，并用 \texttt{ParametricPlot} 绘制边界曲线 $z = \rho(e^{i\theta})/\sigma(e^{i\theta})$。为获得清晰图像，Adams-Bashforth 稳定域较小，采样点设置为 $100$；Adams-Moulton 稳定域较大，采样点为 $80$。
+
+\subsection{数值结果与分析}
+运行 Mathematica 程序得到五阶 Adams-Bashforth 与五阶 Adams-Moulton 的绝对稳定域，如图 \ref{fig:stability} 所示。
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{result.png}
+    \caption{左：五阶 Adams-Bashforth 绝对稳定域；右：五阶 Adams-Moulton 绝对稳定域}
+    \label{fig:stability}
+\end{figure}
+从图中可以清晰地看出：
+\begin{itemize}
+    \item \textbf{五阶 Adams-Bashforth}：其绝对稳定域非常狭小，大致位于原点附近，实部区间约为 $[-0.21, 0]$，虚部范围约为 $[-0.2, 0.2]$。由于显式方法稳定性较差，这一区域仅覆盖负实轴的一小段，对刚性问题的适应性很弱。
+    \item \textbf{五阶 Adams-Moulton}：作为隐式方法，其绝对稳定域宽广得多，实轴覆盖范围约为 $[-1.8, 0]$，并包含部分右半平面。这说明隐式方法能容忍更大的步长和更刚性的系统，具有优秀的稳定性。
+\end{itemize}
+对比二者，鲜明体现了显式与隐式线性多步法在绝对稳定性上的差异，与理论预期完全一致。
+\section{总结}
+本实验完成了两项任务：
+\begin{enumerate}
+    \item 基于 RKF45 自适应方法求解了具有指数增长特性的初值问题。算法通过嵌入误差估计和步长控制，有效跟踪了急剧变化的解，并在接近溢出时安全终止。线性插值功能提供了区间内任意点的近似值。
+    \item 利用 Mathematica 绘制了五阶 Adams-Bashforth 和 Adams-Moulton 的绝对稳定域。结果表明隐式方法拥有远大于显式方法的稳定区域，是处理刚性问题的必要工具。
+\end{enumerate}
+两个实验从不同侧面展示了常微分方程数值求解中自适应策略与稳定性分析的重要性，巩固了课堂理论知识。
+
+\newpage
+\section{附录：程序代码}
+
+\subsection*{作业1：自适应 RKF45 (MATLAB)}
+\begin{lstlisting}[style=matlabstyle, caption={自适应 RKF45 求解器}]
+function solve_ode_rkf45
+% 使用 RKF45 自适应方法求解 y' = exp(y*x) + cos(y - x), y(1) = 3
+
+x0 = 1; y0 = 3;
+h = 0.01;               % 初值步长
+tol = 1e-8;             % 局部误差容限
+x_end_overflow = 1e10;  % 解溢出阈值
+max_steps = 50000;
+
+% ---------- RKF45 系数 ----------
+c = [0; 1/4; 3/8; 12/13; 1; 1/2];
+a = zeros(6,5);
+a(2,1) = 1/4;
+a(3,1) = 3/32;        a(3,2) = 9/32;
+a(4,1) = 1932/2197;   a(4,2) = -7200/2197;  a(4,3) = 7296/2197;
+a(5,1) = 439/216;     a(5,2) = -8;          a(5,3) = 3680/513;   
+a(5,4) = -845/4104;
+a(6,1) = -8/27;       a(6,2) = 2;           a(6,3) = -3544/2565;
+a(6,4) = 1859/4104;   a(6,5) = -11/40;
+
+b4 = [25/216, 0, 1408/2565, 2197/4104, -1/5, 0];
+b5 = [16/135, 0, 6656/12825, 28561/56430, -9/50, 2/55];
+
+x_vals = x0; y_vals = y0;
+x = x0; y = y0;
+for i = 1:max_steps
+    if h < eps, break; end
+    k = zeros(6,1);
+    k(1) = f(x, y);
+    for j = 2:6
+        xj = x + c(j)*h;
+        yj = y + h * (a(j,1:j-1) * k(1:j-1));
+        k(j) = f(xj, yj);
+    end
+    y4 = y + h * (b4 * k);
+    y5 = y + h * (b5 * k);
+    err = abs(y5 - y4);
+    if err <= tol
+        x = x + h;  y = y5;
+        x_vals = [x_vals, x];  y_vals = [y_vals, y];
+        if abs(y) > x_end_overflow || isnan(y) || isinf(y), break; end
+        if err > 0
+            h_new = 0.9 * h * (tol/err)^(1/5);
+        else
+            h_new = 2 * h;
+        end
+        h = min(5*h, max(0.2*h, h_new));
+    else
+        if err > 0
+            h_new = 0.9 * h * (tol/err)^(1/5);
+        else
+            h_new = 0.5 * h;
+        end
+        h = max(0.2*h, h_new);
+    end
+end
+fprintf('解的范围: [1, %.6f]\n', x_vals(end));
+while true
+    xq = input('请输入一个介于上述范围的值: ');
+    if isempty(xq), break; end
+    if xq < x_vals(1) || xq > x_vals(end)
+        fprintf('输入超出范围，请重新输入.\n'); continue;
+    end
+    yq = interp1(x_vals, y_vals, xq, 'linear');
+    fprintf('插值结果 y(%.6f) = %.10f\n', xq, yq);
+    break;
+end
+end
+
+function dydx = f(x, y)
+    dydx = exp(y * x) + cos(y - x);
+end
+\end{lstlisting}
+
+\subsection*{作业2：绝对稳定域绘制 (Mathematica)}
+\begin{lstlisting}[style=mathstyle, caption={绘制五阶 Adams-Bashforth 与 Adams-Moulton 绝对稳定域}]
+(* 公共 \[Rho] 生成多项式 *)
+rho[\[Zeta]_] := \[Zeta]^5 - \[Zeta]^4
+
+(* 五阶 Adams-Bashforth *)
+sigmaAB[\[Zeta]_] := (1901 \[Zeta]^4 - 2774 \[Zeta]^3 + 
+    2616 \[Zeta]^2 - 1274 \[Zeta] + 251)/720
+
+(* 五阶 Adams-Moulton *)
+sigmaAM[\[Zeta]_] := (251 \[Zeta]^5 + 646 \[Zeta]^4 - 264 \[Zeta]^3 + 
+    106 \[Zeta]^2 - 19 \[Zeta])/720
+
+(* 稳定性判断 *)
+stableQ[z_, \[Sigma]_] := Module[{poly, roots},
+   poly = rho[\[Zeta]] - z \[Sigma][\[Zeta]];
+   roots = \[Zeta] /. NSolve[poly == 0, \[Zeta]];
+   Max[Abs[roots]] <= 1 + 10^-6];
+stableQAB[z_] := stableQ[z, sigmaAB]
+stableQAM[z_] := stableQ[z, sigmaAM]
+
+(* Adams-Bashforth 区域与边界 *)
+abRegion = RegionPlot[stableQAB[x + I y], {x, -0.25, 0.05}, {y, -0.25, 0.25},
+   PlotPoints -> 100, BoundaryStyle -> None, 
+   PlotStyle -> Directive[Blue, Opacity[0.35]], AspectRatio -> Automatic];
+abBoundary = ParametricPlot[
+   {Re[rho[E^(I t)]/sigmaAB[E^(I t)]], Im[rho[E^(I t)]/sigmaAB[E^(I t)]]},
+   {t, 0, 2 Pi}, PlotStyle -> Directive[Red, Thickness[0.005]]];
+plotAB = Show[abRegion, abBoundary, PlotRange -> {{-0.25, 0.05}, {-0.25, 0.25}},
+   Frame -> True, FrameLabel -> {"Re(z)", "Im(z)"}, 
+   PlotLabel -> "五阶 Adams-Bashforth 绝对稳定域", ImageSize -> Medium];
+
+(* Adams-Moulton 区域与边界 *)
+amRegion = RegionPlot[stableQAM[x + I y], {x, -5, 2}, {y, -3, 3},
+   PlotPoints -> 80, BoundaryStyle -> None, 
+   PlotStyle -> Directive[Green, Opacity[0.3]], AspectRatio -> Automatic];
+amBoundary = ParametricPlot[
+   {Re[rho[E^(I t)]/sigmaAM[E^(I t)]], Im[rho[E^(I t)]/sigmaAM[E^(I t)]]},
+   {t, 0, 2 Pi}, PlotStyle -> Directive[Blue, Thickness[0.005]]];
+plotAM = Show[amRegion, amBoundary, PlotRange -> {{-3, 1}, {-2, 2}},
+   Frame -> True, FrameLabel -> {"Re(z)", "Im(z)"}, 
+   PlotLabel -> "五阶 Adams-Moulton 绝对稳定域", ImageSize -> Medium];
+
+GraphicsRow[{plotAB, plotAM}, Spacings -> Scaled[0.02]]
+\end{lstlisting}
+
+\end{document}

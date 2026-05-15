@@ -1,0 +1,99 @@
+\documentclass{article}
+\textheight 23.5cm \textwidth 15.8cm
+%\leftskip -1cm
+\topmargin -1.5cm \oddsidemargin 0.3cm \evensidemargin -0.3cm
+%\documentclass[final]{siamltex}
+
+\usepackage[UTF8]{ctex}
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+
+%\pagestyle{fancy} \lhead{FDM Homework Template} \chead{}
+%\rhead{\bfseries Yan XU}
+%
+%\lfoot{} \cfoot{} \rfoot{\thepage}
+%\renewcommand{\headrulewidth}{0.4pt}
+%\renewcommand{\footrulewidth}{0.4pt}
+%
+\title{HW1 说明文档}
+\author{李佩优}
+
+\begin{document}
+\maketitle
+
+\section{引言}
+
+本次作业的任务是对函数$f(x)=\frac{1}{1+x^2}, x \in [-5,5]$ 构造lagrange插值多项式，并分析其$L^{\infty}$范数意义下的误差。
+
+\section{原理}
+
+Lagrange插值多项式的构造方法如下：
+用给定插值点$x_1,x_2,...,x_n$，
+构造对应基函数$l_i(x)=\prod_{j=1,j\neq i}^n \frac{x-x_j}{x_i-x_j}$；
+再线性组合各基函数，构成拉格朗日插值函数$P_L(x)=\sum f(x_i)\cdot l_i(x)$
+
+\section{结果}
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=\textwidth]{hw1_btty.png}
+\caption{在北太天元中运行N=10时的图像} \label{hw1_btty}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    % 第一个子图
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{result1.png}
+        \caption{matlab中运行输出}
+        \label{fig:sub1}
+    \end{subfigure}
+    \hfill % 在子图之间添加间距
+    % 第二个子图
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{result2.png}
+        \caption{北太天元中运行输出}
+        \label{fig:sub2}
+    \end{subfigure}
+    % 整个图集的标题
+    % \caption{这是包含两个子图的整体标题}
+    \label{fig:total}
+\end{figure}
+
+\begin{table}[htb]
+\caption{\label{table.label} 误差估计} \centering
+\bigskip
+\begin{small}
+\begin{tabular}{|c|cc|cc|}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+  n & grid(1)$ L^\infty$ 误差 & grid(2)$ L^\infty$ 误差 \\\hline
+5 &   4.327E-01  &  5.559E-01\\
+10&   1.916E+00  &  1.089E-01\\
+20&   5.827E+01  &  1.533E-02\\
+40&   7.869E+04  &  2.739E-04\\\hline
+\end{tabular}
+\end{small}
+\end{table}
+\section{讨论}
+
+从结果可以看出，等距节点的误差随着n的增加呈现爆炸式增长，
+而切比雪夫节点的误差则随着n的增加呈现指数级下降。
+这是因为等距节点在区间两端会出现Runge现象，导致插值多项式在区间两端出现剧烈震荡，从而导致误差增大。
+而切比雪夫节点则能够有效地避免Runge现象，使得插值多项式在整个区间内都能够较好地逼近原函数，从而使得误差较小。
+
+\appendix
+\section{源代码}
+
+
+\small \hrule \verbatiminput{hw1.m} \hrule
+
+
+\end{document}

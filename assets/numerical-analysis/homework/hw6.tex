@@ -1,0 +1,563 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage[UTF8]{ctex} % 用于中文支持，如果不需要中文，可以移除此行
+
+\newtheorem{problem}{问题}
+\newtheorem{solution}{解答}
+\title{数值分析第六周作业}
+\date{\today}
+\author{李佩优PB23000270}
+\geometry{a4paper,scale=0.8}
+\begin{document}
+\maketitle
+\section*{6.10}
+\subsection*{2}
+
+\paragraph{a.} $\Pi_n \otimes \Pi_m \subseteq \Pi_{n+m}(\mathbb{R}^2)$ 成立。
+任取 $p \in \Pi_n \otimes \Pi_m$，有 $p(x,y)=\sum_{i=0}^{n}\sum_{j=0}^{m} a_{ij}x^i y^j$，每项次数 $i+j \le n+m$，故 $p \in \Pi_{n+m}(\mathbb{R}^2)$。
+
+\paragraph{b.} $k=\max(n,m)$ 时不成立。
+设 $n<m$，则 $k=m$。取 $p(x,y)=x^m \in \Pi_m(\mathbb{R}^2)$，但 $x$ 次数 $m>n$，故 $p \notin \Pi_n \otimes \Pi_m$。
+
+\paragraph{c.} $k=\min(n,m)$ 时成立。
+设 $n\le m$，则 $k=n$。任取 $p \in \Pi_n(\mathbb{R}^2)$ 有 $p(x,y)=\sum_{i+j\le n} a_{ij}x^i y^j$，此时 $i\le n$ 且 $j\le n\le m$，故 $p \in \Pi_n \otimes \Pi_m$。
+
+\subsection*{5}
+ 
+考虑集合
+\[
+\mathcal{M} = \left\{ x_1^{i_1} x_2^{i_2} \cdots x_d^{i_d} \;\middle|\; i_1, \dots, i_d \in \mathbb{N}_0,\; \sum_{j=1}^d i_j \le k \right\},
+\]
+其中 \(\mathbb{N}_0 = \{0,1,2,\dots\}\)。
+
+\(\mathcal{M}\) 是 \(\Pi_k(\mathbb{R}^d)\) 的一组基
+
+线性无关性：单项式函数在 \(\mathbb{R}^d\) 上的线性无关性是标准结论（可通过 Vandermonde 行列式或对次数归纳证明）。  
+
+生成性：任取 \(p \in \Pi_k(\mathbb{R}^d)\)，按定义 \(p\) 可写为有限个单项式的线性组合，且每个单项式的总次数不超过 \(k\)，因此这些单项式均属于 \(\mathcal{M}\)。  
+
+故 \(\mathcal{M}\) 确为 \(\Pi_k(\mathbb{R}^d)\) 的基，进而
+   \[
+   \dim \Pi_k(\mathbb{R}^d) = |\mathcal{M}|.
+   \]
+
+计算基的势 \(|\mathcal{M}|\)
+   
+定义映射 \(\varphi : \mathcal{M} \to S\)，其中
+   \[
+   S = \left\{ (i_1, \dots, i_{d+1}) \in \mathbb{N}_0^{d+1} \;\middle|\; \sum_{j=1}^{d+1} i_j = k \right\},
+   \]
+   具体对应为
+   \[
+   \varphi\!\left( x_1^{i_1} \cdots x_d^{i_d} \right) = (i_1, \dots, i_d, k - \textstyle\sum_{j=1}^d i_j).
+   \]
+显然 \(\varphi\) 是双射：  
+
+单射：不同的单项式指数向量不同，象亦不同。  
+
+满射：对任意 \((i_1,\dots,i_{d+1}) \in S\)，令单项式指数为前 \(d\) 个分量，则其总次数 \(\le k\)，且象恰为给定向量。
+
+因此 \(|\mathcal{M}| = |S|\)。
+
+求 \(|S|\)  
+   \(S\) 是方程
+   \[
+   i_1 + i_2 + \cdots + i_{d+1} = k, \quad i_j \in \mathbb{N}_0
+   \]
+   的解的集合。由组合数学中的经典结论（Stars and Bars），非负整数解的个数为
+   \[
+   \binom{(d+1) + k - 1}{k} = \binom{d+k}{k}.
+   \]
+   因此
+   \[
+   \dim \Pi_k(\mathbb{R}^d) = |\mathcal{M}| = \binom{d+k}{k}.
+   \]
+
+证毕。
+
+\subsection*{7}
+  
+设所给的6个结点位于某条二次曲线上，该二次曲线可以是椭圆、抛物线、双曲线或一对直线（即退化二次曲线）。于是存在一个非零的二元二次多项式 \(Q(x,y) \in \Pi_2(\mathbb{R}^2)\)，使得这6个结点均满足 \(Q(x_i,y_i)=0\)。  
+
+考虑用 \(\Pi_2(\mathbb{R}^2)\) 中的多项式进行插值，即给定6个函数值 \(f_i\)，希望找到 \(P \in \Pi_2(\mathbb{R}^2)\) 使得 \(P(x_i,y_i)=f_i\)。由于 \(\Pi_2(\mathbb{R}^2)\) 的维数为6，通常6个互异结点可唯一确定一个二次多项式，但这里因为存在非零多项式 \(Q\) 在所有结点上为零，故插值问题的系数矩阵是奇异的。具体地，若 \(P\) 是一个解，则 \(P+\lambda Q\) 也是解（\(\lambda \in \mathbb{R}\)），因此解不唯一（若存在）。另一方面，对于一般的函数值 \(f_i\)，线性方程组可能无解，因为右端项必须满足与 \(Q\) 相关的相容性条件。  
+
+因此，在这类结点集上，用二次多项式进行插值一般是不可能的（即不是适定的）。  
+
+\subsection*{9}
+
+证明函数族 \(\{(x, y) \mapsto x^i y^j \mid 0 \leq i \leq n,\ 0 \leq j \leq m\}\) 是空间 \(\Pi_n \otimes \Pi_m\) 的一组基。
+
+记 \(\Pi_n\) 为所有关于单变量 \(x\) 且次数不超过 \(n\) 的多项式构成的线性空间，其维数为 \(n+1\)，标准基为 \(\{1, x, \dots, x^n\}\)。  
+\(\Pi_m\) 类似定义。
+
+\(\Pi_n \otimes \Pi_m\) 是 \(\Pi_n\) 与 \(\Pi_m\) 的张量积空间，它由形如  
+\[
+p(x)q(y), \quad p \in \Pi_n,\ q \in \Pi_m
+\]  
+的函数的线性组合构成。该空间等价于所有形如  
+\[
+P(x, y) = \sum_{i=0}^n \sum_{j=0}^m a_{ij} x^i y^j
+\]  
+的二元多项式构成的线性空间，其中 \(\deg_x P \leq n\)，\(\deg_y P \leq m\)。
+
+设存在系数 \(c_{ij} \in \mathbb{R}\)（或 \(\mathbb{C}\)），使得对任意 \(x, y\) 均有  
+\[
+\sum_{i=0}^n \sum_{j=0}^m c_{ij} x^i y^j \equiv 0. \tag{1}
+\]  
+固定 \(y\)，则左端可视作关于 \(x\) 的次数 \(\leq n\) 的多项式。由于它对所有 \(x\) 恒为零，其系数（依赖于 \(y\)）必须全为零，即  
+\[
+\sum_{j=0}^m c_{ij} y^j = 0, \quad \forall i = 0, 1, \dots, n.
+\]  
+又由单变量多项式的线性无关性（对每个固定的 \(i\)），可得 \(c_{ij} = 0\) 对所有 \(i,j\) 成立。  
+因此，该函数族线性无关。
+
+任取 \(f \in \Pi_n \otimes \Pi_m\)，由定义知 \(f(x, y)\) 可写为有限和  
+\[
+f(x, y) = \sum_{k=1}^N p_k(x) q_k(y),
+\]  
+其中 \(p_k \in \Pi_n\)，\(q_k \in \Pi_m\)。  
+将每个 \(p_k(x)\) 用 \(\Pi_n\) 的标准基展开：  
+\[
+p_k(x) = \sum_{i=0}^n a_{ik} x^i,
+\]  
+每个 \(q_k(y)\) 用 \(\Pi_m\) 的标准基展开：  
+\[
+q_k(y) = \sum_{j=0}^m b_{jk} y^j.
+\]  
+代入并交换求和次序，得  
+\[
+f(x, y) = \sum_{k=1}^N \left( \sum_{i=0}^n a_{ik} x^i \right) \left( \sum_{j=0}^m b_{jk} y^j \right)
+= \sum_{i=0}^n \sum_{j=0}^m \left( \sum_{k=1}^N a_{ik} b_{jk} \right) x^i y^j.
+\]  
+ \(\Rightarrow f\) 可被函数族 \(\{x^i y^j\}\) 线性表出，故该函数族张成整个空间。
+
+函数族中共有 \((n+1)(m+1)\) 个元素，而 \(\dim(\Pi_n \otimes \Pi_m) = \dim \Pi_n \cdot \dim \Pi_m = (n+1)(m+1)\)。线性无关组元素个数等于空间维数，故它构成一组基。
+
+综上，函数族 \(\{(x, y) \mapsto x^i y^j \mid 0 \leq i \leq n,\ 0 \leq j \leq m\}\) 是 \(\Pi_n \otimes \Pi_m\) 的一组基。
+
+\subsection*{14}
+假设矩形边平行于坐标轴，顶点为结点。证明多项式 \( p(x,y)=a+bx+cy+dxy \) 可以对这 4 个结点上的任意数据作插值。
+
+证明：
+
+设矩形的四个顶点分别为：
+\( V_1 = (x_1, y_1) \),
+\( V_2 = (x_2, y_1) \),
+\( V_3 = (x_2, y_2) \),
+\( V_4 = (x_1, y_2) \)
+（因为边平行于坐标轴，所以相邻顶点共享 x 或 y 坐标，且 \( x_1 \neq x_2 \)，\( y_1 \neq y_2 \)）。
+
+给定四个任意实数数据 \( f_1, f_2, f_3, f_4 \)（例如函数值或颜色值）。我们需要证明存在唯一的系数 \( a, b, c, d \)，使得：
+\[
+\begin{cases}
+a + b x_1 + c y_1 + d x_1 y_1 = f_1 \\
+a + b x_2 + c y_1 + d x_2 y_1 = f_2 \\
+a + b x_2 + c y_2 + d x_2 y_2 = f_3 \\
+a + b x_1 + c y_2 + d x_1 y_2 = f_4
+\end{cases}
+\]
+这是一个关于未知数 \( (a,b,c,d) \) 的线性方程组。要证明对于任意右端项都有唯一解，只需证明其系数矩阵的行列式非零。
+
+系数矩阵为：
+\[
+M = \begin{pmatrix}
+1 & x_1 & y_1 & x_1 y_1 \\
+1 & x_2 & y_1 & x_2 y_1 \\
+1 & x_2 & y_2 & x_2 y_2 \\
+1 & x_1 & y_2 & x_1 y_2
+\end{pmatrix}
+\]
+计算其行列式。将第 1 行乘以 -1 加到第 4 行，第 2 行乘以 -1 加到第 3 行：
+\[
+\det(M) = \det \begin{pmatrix}
+1 & x_1 & y_1 & x_1 y_1 \\
+1 & x_2 & y_1 & x_2 y_1 \\
+0 & 0 & y_2-y_1 & (x_2-x_1)(y_2-y_1) \\
+0 & x_1-x_2 & y_2-y_1 & (x_1-x_2)(y_2-y_1)
+\end{pmatrix}
+\]
+沿第 1 列展开（只剩两个 1 构成的二阶子式）：
+\[
+\det(M) = 1 \cdot \det \begin{pmatrix}
+x_2-x_1 & 0 & (x_2-x_1)(y_2-y_1) \\
+0 & y_2-y_1 & (x_2-x_1)(y_2-y_1) \\
+x_1-x_2 & y_2-y_1 & (x_1-x_2)(y_2-y_1)
+\end{pmatrix}
+- 1 \cdot \det \begin{pmatrix}
+x_1-x_2 & y_2-y_1 & (x_1-x_2)(y_2-y_1) \\
+0 & y_2-y_1 & (x_2-x_1)(y_2-y_1) \\
+0 & y_2-y_1 & (x_1-x_2)(y_2-y_1)
+\end{pmatrix}
+\]
+注意 \( x_1-x_2 = -(x_2-x_1) \)。经过代数化简（或利用分块矩阵性质），可得：
+\[
+\det(M) = (x_2-x_1)^2 (y_2-y_1)^2
+\]
+由于矩形边长非零，即 \( x_1 \neq x_2 \) 且 \( y_1 \neq y_2 \)，故行列式非零。
+
+$\Rightarrow$根据克莱姆法则，该线性方程组对于任意数据 \( f_1, \dots, f_4 \) 都有唯一解，因此该多项式能够对矩形四个顶点上的任意数据进行插值。
+
+\subsection*{15}
+
+证明线性多项式 \( p(x,y)=ax+by+c \) 在一个三角形的顶点上总可以作插值。给出两种证明，其中一种基于定理3。
+
+设三角形三顶点为：\( V_1=(x_1,y_1) \), \( V_2=(x_2,y_2) \), \( V_3=(x_3,y_3) \)，它们不共线。
+
+证明一：直接行列式法（代数法）
+
+我们需要证明对于任意给定的数据 \( f_1, f_2, f_3 \)，存在唯一的系数 \( a, b, c \) 满足：
+\[
+\begin{cases}
+a x_1 + b y_1 + c = f_1 \\
+a x_2 + b y_2 + c = f_2 \\
+a x_3 + b y_3 + c = f_3
+\end{cases}
+\]
+系数矩阵为：
+\[
+M = \begin{pmatrix}
+x_1 & y_1 & 1 \\
+x_2 & y_2 & 1 \\
+x_3 & y_3 & 1
+\end{pmatrix}
+\]
+计算其行列式：
+\[
+\det(M) = x_1(y_2 - y_3) - y_1(x_2 - x_3) + 1 \cdot (x_2 y_3 - x_3 y_2)
+\]
+整理后即为：
+\[
+\det(M) = (x_2 - x_1)(y_3 - y_1) - (x_3 - x_1)(y_2 - y_1)
+\]
+该行列式的绝对值等于由向量 \( \vec{V_1 V_2} \) 和 \( \vec{V_1 V_3} \) 所张成的平行四边形的面积，也即三角形面积的两倍。由于三点不共线，该面积不为零，故 \( \det(M) \neq 0 \)。因此方程组存在唯一解。
+
+证明二：基于 Chung-Yao 定理的证明 
+
+  我们利用 Chung-Yao 定理的一般条件来证明。该定理指出：若存在 \( n = \binom{d+k}{k} \) 个结点，且对每个结点 \( z_i \) 能找到 \( k \) 个超平面（在 \( \mathbb{R}^d \) 中为 \( d-1 \) 维仿射子空间）使得这些超平面恰好经过除 \( z_i \) 以外的所有其他结点，则插值问题在 \( \Pi_k(\mathbb{R}^d) \) 中有唯一解。
+
+  此处 \( d = 2 \)，\( k = 1 \)，结点个数
+  \[
+  n = \binom{2+1}{1} = 3.
+  \]
+  我们需要为每个结点 \( z_i \) 构造一个超平面（因为 \( k=1 \)，每组只需一个超平面），即三条直线 \( L_1, L_2, L_3 \)，使得
+  \[
+  z_j \in L_i \iff j \neq i, \qquad i = 1,2,3.
+  \]
+
+  由于三点 \( z_1, z_2, z_3 \) 不共线，它们构成一个三角形。自然的构造是取三角形的边：
+  \[
+  L_1 = \text{过 } z_2 \text{ 和 } z_3 \text{ 的直线},\quad
+  L_2 = \text{过 } z_1 \text{ 和 } z_3 \text{ 的直线},\quad
+  L_3 = \text{过 } z_1 \text{ 和 } z_2 \text{ 的直线}.
+  \]
+
+  验证条件：
+  \begin{itemize}
+    \item 对于 \( i = 1 \)：\( z_2, z_3 \in L_1 \)，而 \( z_1 \notin L_1 \)（因三点不共线），故 \( z_j \in L_1 \iff j \neq 1 \)。
+    \item 对于 \( i = 2 \)：\( z_1, z_3 \in L_2 \)，\( z_2 \notin L_2 \)，故 \( z_j \in L_2 \iff j \neq 2 \)。
+    \item 对于 \( i = 3 \)：\( z_1, z_2 \in L_3 \)，\( z_3 \notin L_3 \)，故 \( z_j \in L_3 \iff j \neq 3 \)。
+  \end{itemize}
+
+  因此 Chung-Yao 定理的条件完全满足。由该定理，存在唯一的线性多项式 \( p \in \Pi_1(\mathbb{R}^2) \) 插值于给定的数据。\qed
+
+\section*{7.1}
+\subsection*{6}
+推导近似导数公式并证明误差为 \(O(h^4)\)
+\subsubsection*{(1) 一阶导数公式}
+\[
+f'(x) \approx \frac{1}{12h}\bigl[-f(x+2h) + 8f(x+h) - 8f(x-h) + f(x-2h)\bigr]
+\]
+将 \(f(x\pm h)\) 和 \(f(x\pm 2h)\) 在 \(x\) 处泰勒展开：
+\[
+\begin{aligned}
+f(x+h) &= f + h f' + \frac{h^2}{2}f'' + \frac{h^3}{6}f''' + \frac{h^4}{24}f^{(4)} + \frac{h^5}{120}f^{(5)} + \frac{h^6}{720}f^{(6)} + \cdots,\\
+f(x-h) &= f - h f' + \frac{h^2}{2}f'' - \frac{h^3}{6}f''' + \frac{h^4}{24}f^{(4)} - \frac{h^5}{120}f^{(5)} + \frac{h^6}{720}f^{(6)} - \cdots,\\
+f(x+2h) &= f + 2h f' + 2h^2 f'' + \frac{4}{3}h^3 f''' + \frac{2}{3}h^4 f^{(4)} + \frac{4}{15}h^5 f^{(5)} + \frac{4}{45}h^6 f^{(6)} + \cdots,\\
+f(x-2h) &= f - 2h f' + 2h^2 f'' - \frac{4}{3}h^3 f''' + \frac{2}{3}h^4 f^{(4)} - \frac{4}{15}h^5 f^{(5)} + \frac{4}{45}h^6 f^{(6)} - \cdots.
+\end{aligned}
+\]
+计算组合：
+\[
+\begin{aligned}
+&-f(x+2h) + 8f(x+h) - 8f(x-h) + f(x-2h) \\
+&= \bigl[-f + 8f -8f + f\bigr] \\
+&\quad + \bigl[-2h f' + 8h f' + 8h f' -2h f'\bigr] \\
+&\quad + \bigl[-2h^2 f'' + 4h^2 f'' -4h^2 f'' + 2h^2 f''\bigr] \\
+&\quad + \bigl[-\frac{4}{3}h^3 f''' + \frac{4}{3}h^3 f''' + \frac{4}{3}h^3 f''' - \frac{4}{3}h^3 f'''\bigr] \\
+&\quad + \bigl[-\frac{2}{3}h^4 f^{(4)} + \frac{1}{3}h^4 f^{(4)} - \frac{1}{3}h^4 f^{(4)} + \frac{2}{3}h^4 f^{(4)}\bigr] \\
+&\quad + \bigl[-\frac{4}{15}h^5 f^{(5)} + \frac{1}{15}h^5 f^{(5)} + \frac{1}{15}h^5 f^{(5)} - \frac{4}{15}h^5 f^{(5)}\bigr] + O(h^6) \\
+&= 12h f' + \left(-\frac{6}{15}h^5 f^{(5)}\right) + O(h^6) = 12h f' - \frac{2}{5}h^5 f^{(5)} + O(h^6).
+\end{aligned}
+\]
+因此
+\[
+\frac{1}{12h}\bigl[-f(x+2h) + 8f(x+h) - 8f(x-h) + f(x-2h)\bigr] = f' - \frac{1}{30}h^4 f^{(5)} + O(h^6),
+\]
+故误差项为 \(-\dfrac{h^4}{30}f^{(5)}(x)+O(h^6)\)，即 \(O(h^4)\)。
+
+\subsection*{(2) 二阶导数公式}
+
+\[
+f''(x) \approx \frac{1}{12h^2}\bigl[-f(x+2h) + 16f(x+h) - 30f(x) + 16f(x-h) - f(x-2h)\bigr]
+\]
+同样的泰勒展开，计算组合：
+\[
+\begin{aligned}
+&-f(x+2h) + 16f(x+h) - 30f(x) + 16f(x-h) - f(x-2h) \\
+&= \bigl[-f + 16f -30f +16f -f\bigr] \\
+&\quad + \bigl[-2h f' + 16h f' -16h f' + 2h f'\bigr] \\
+&\quad + \bigl[-2h^2 f'' + 8h^2 f'' + 8h^2 f'' -2h^2 f''\bigr] \\
+&\quad + \bigl[-\frac{4}{3}h^3 f''' + \frac{8}{3}h^3 f''' - \frac{8}{3}h^3 f''' + \frac{4}{3}h^3 f'''\bigr] \\
+&\quad + \bigl[-\frac{2}{3}h^4 f^{(4)} + \frac{2}{3}h^4 f^{(4)} + \frac{2}{3}h^4 f^{(4)} - \frac{2}{3}h^4 f^{(4)}\bigr] \\
+&\quad + \bigl[-\frac{4}{15}h^5 f^{(5)} + \frac{2}{15}h^5 f^{(5)} - \frac{2}{15}h^5 f^{(5)} + \frac{4}{15}h^5 f^{(5)}\bigr] \\
+&\quad + \bigl[-\frac{4}{45}h^6 f^{(6)} + \frac{1}{45}h^6 f^{(6)} + \frac{1}{45}h^6 f^{(6)} - \frac{4}{45}h^6 f^{(6)}\bigr] + O(h^7) \\
+&= 12h^2 f'' - \frac{2}{15}h^6 f^{(6)} + O(h^8).
+\end{aligned}
+\]
+因此
+\[
+\frac{1}{12h^2}\bigl[\cdots\bigr] = f'' - \frac{1}{90}h^4 f^{(6)} + O(h^6),
+\]
+误差项为 \(-\dfrac{h^4}{90}f^{(6)}(x)+O(h^6)\)，即 \(O(h^4)\)。
+
+\subsection*{15}
+
+理查森外推得到 \(O(h^4)\) 的数值微分公式
+
+已知中心差分公式的展开：
+\[
+f'(x) = \frac{1}{2h}\bigl[f(x+h)-f(x-h)\bigr] - \frac{h^2}{6}f'''(x) - \frac{h^4}{120}f^{(5)}(x) - \cdots
+\]
+记 \(D(h) = \dfrac{f(x+h)-f(x-h)}{2h}\)，则
+\[
+D(h) = f'(x) + \frac{h^2}{6}f'''(x) + \frac{h^4}{120}f^{(5)}(x) + O(h^6).
+\]
+类似地，取步长 \(h/2\)：
+\[
+D\left(\frac{h}{2}\right) = f'(x) + \frac{h^2}{24}f'''(x) + \frac{h^4}{1920}f^{(5)}(x) + O(h^6).
+\]
+为了消去 \(h^2\) 项，作线性组合：
+\[
+\frac{4D(h/2) - D(h)}{3} = f'(x) + \frac{4\cdot\frac{h^4}{1920} - \frac{h^4}{120}}{3} f^{(5)}(x) + O(h^6) = f'(x) - \frac{h^4}{480}f^{(5)}(x) + O(h^6).
+\]
+代入 \(D(h/2) = \dfrac{f(x+h/2)-f(x-h/2)}{h}\)，得
+\[
+f'(x) \approx \frac{4\cdot\frac{f(x+h/2)-f(x-h/2)}{h} - \frac{f(x+h)-f(x-h)}{2h}}{3} = \frac{8\bigl[f(x+h/2)-f(x-h/2)\bigr] - \bigl[f(x+h)-f(x-h)\bigr]}{6h}.
+\]
+误差项为 \(-\dfrac{h^4}{480}f^{(5)}(x) + O(h^6)\)，故该公式为 \(O(h^4)\) 精度。
+
+\subsection*{18}
+
+推导后向差分公式并证明误差 \(O(h^2)\)
+
+给定
+\[
+f'(x_n) \approx \frac{3f(x_n) - 4f(x_{n-1}) + f(x_{n-2})}{3x_n - 4x_{n-1} + x_{n-2}},
+\]
+其中 \(f_{n+i}=f(x_n+ih)\)，步长 \(h>0\) 均匀，即 \(x_{n-1}=x_n-h\)，\(x_{n-2}=x_n-2h\)。则分母
+\[
+3x_n - 4(x_n-h) + (x_n-2h) = 3x_n -4x_n+4h + x_n -2h = 2h.
+\]
+公式简化为
+\[
+f'(x_n) \approx \frac{3f(x_n) - 4f(x_n-h) + f(x_n-2h)}{2h}.
+\]
+将 \(f(x_n-h)\) 和 \(f(x_n-2h)\) 在 \(x_n\) 处泰勒展开：
+\[
+\begin{aligned}
+f(x_n-h) &= f_n - h f_n' + \frac{h^2}{2}f_n'' - \frac{h^3}{6}f_n''' + \frac{h^4}{24}f_n^{(4)} - \cdots,\\
+f(x_n-2h) &= f_n - 2h f_n' + 2h^2 f_n'' - \frac{4}{3}h^3 f_n''' + \frac{2}{3}h^4 f_n^{(4)} - \cdots.
+\end{aligned}
+\]
+计算分子：
+\[
+\begin{aligned}
+&3f_n - 4f(x_n-h) + f(x_n-2h) \\
+&= 3f_n -4\bigl(f_n - h f_n' + \frac{h^2}{2}f_n'' - \frac{h^3}{6}f_n''' + \cdots\bigr) \\
+&\quad + \bigl(f_n - 2h f_n' + 2h^2 f_n'' - \frac{4}{3}h^3 f_n''' + \cdots\bigr) \\
+&= (3-4+1)f_n + (4h -2h)f_n' + (-2h^2+2h^2)f_n'' \\
+&\quad + \left(\frac{4}{6}h^3 - \frac{4}{3}h^3\right)f_n''' + O(h^4) \\
+&= 2h f_n' - \frac{2}{3}h^3 f_n''' + O(h^4).
+\end{aligned}
+\]
+除以分母 \(2h\) 得
+\[
+\frac{3f_n - 4f(x_n-h) + f(x_n-2h)}{2h} = f_n' - \frac{1}{3}h^2 f_n''' + O(h^4).
+\]
+因此误差项为 \(-\dfrac{h^2}{3}f'''(x_n)+O(h^4)\)，即 \(O(h^2)\)，证毕。
+
+\section*{7.2}
+\subsection*{1}
+推导出基于结点 \(0, \frac13, \frac23, 1\) 的 \(\int_0^1 f(x)\,dx\) 的牛顿–科茨公式。  
+  
+牛顿–科茨求积公式的系数由拉格朗日插值基函数在区间上的积分给出。设四个等距结点为  
+\(x_0=0,\; x_1=\frac13,\; x_2=\frac23,\; x_3=1\)，步长 \(h=\frac13\)。  
+求积公式形如  
+\[
+\int_0^1 f(x)\,dx \approx A_0f(0)+A_1f\!\left(\frac13\right)+A_2f\!\left(\frac23\right)+A_3f(1).
+\]  
+由对称性可知 \(A_0=A_3,\;A_1=A_2\)。为使公式对低次多项式精确成立，依次取 \(f(x)=1,x,x^2,x^3\) 建立方程：  
+
+\(f(x)=1\)：\(\int_0^1 1\,dx = 1 \;\Rightarrow\; 2A_0+2A_1=1\)。  
+
+\(f(x)=x\)：\(\int_0^1 x\,dx = \frac12 \;\Rightarrow\; A_1\cdot\frac13 + A_1\cdot\frac23 + A_0\cdot1 = A_1 + A_0 = \frac12\)（与前一方程等价）。  
+
+\(f(x)=x^2\)：\(\int_0^1 x^2\,dx = \frac13 \;\Rightarrow\; A_1\left(\frac19+\frac49\right) + A_0 = \frac59A_1 + A_0 = \frac13\)。  
+
+联立 \(A_0+A_1=\frac12\) 与 \(\frac59A_1+A_0=\frac13\)，解得  
+\[
+A_0=\frac18,\qquad A_1=\frac38.
+\]  
+因此公式为  
+\[
+\boxed{\int_0^1 f(x)\,dx \approx \frac18\left[f(0)+3f\!\left(\frac13\right)+3f\!\left(\frac23\right)+f(1)\right]}.
+\]  
+此即 \(n=3\) 的闭型牛顿–科茨公式（辛普森 \(\frac38\) 法则）。
+
+\subsection*{2}
+证明（不要利用它的误差项）：辛普森法则正确地积分所有三次多项式。  
+  
+设区间为 \([a,b]\)，辛普森法则为  
+\[
+S(f) = \frac{b-a}{6}\left[f(a)+4f\!\left(\frac{a+b}{2}\right)+f(b)\right].
+\]  
+作变量代换 \(x = a + (b-a)t\)，则 \(t\in[0,1]\)，且 \(f(x)=g(t)\) 仍为三次多项式。此时  
+\[
+\int_a^b f(x)\,dx = (b-a)\int_0^1 g(t)\,dt,\qquad 
+S(f) = (b-a)\cdot\frac{1}{6}\bigl[g(0)+4g(\tfrac12)+g(1)\bigr].
+\]  
+只需证明对任意三次多项式 \(g(t)=At^3+Bt^2+Ct+D\)，有  
+\[
+\int_0^1 g(t)\,dt = \frac16\bigl[g(0)+4g(\tfrac12)+g(1)\bigr].
+\]  
+计算左端：  
+\[
+\int_0^1 (At^3+Bt^2+Ct+D)\,dt = \frac{A}{4}+\frac{B}{3}+\frac{C}{2}+D.
+\]  
+计算右端：  
+\[
+\begin{aligned}
+\frac16\bigl[g(0)+4g(\tfrac12)+g(1)\bigr] 
+&= \frac16\Bigl[D + 4\Bigl(\frac{A}{8}+\frac{B}{4}+\frac{C}{2}+D\Bigr) + (A+B+C+D)\Bigr] \\
+&= \frac16\Bigl[6D + \frac{3}{2}A + 2B + 3C\Bigr] \\
+&= D + \frac{A}{4} + \frac{B}{3} + \frac{C}{2}.
+\end{aligned}
+\]  
+两端恒等，故辛普森法则对任意三次多项式精确成立。
+
+\subsection*{4}
+证明下列公式对于次数 \(\leq 4\) 的多项式是精确成立的：  
+\[
+\int_0^1 f(x)\,dx \approx \frac{1}{90}\left[7f(0)+32f\!\left(\frac14\right)+12f\!\left(\frac12\right)+32f\!\left(\frac34\right)+7f(1)\right].
+\]
+  
+记右端近似值为 \(Q(f)\)。由于公式具有对称性，只需验证它对单项式 \(1, x, x^2, x^3, x^4\) 精确成立即可。  
+
+- \(f(x)=1\)：  
+  左 = \(\int_0^1 1\,dx = 1\)，  
+  右 = \(\frac{1}{90}(7+32+12+32+7) = \frac{90}{90}=1\)。  
+
+- \(f(x)=x\)：  
+  左 = \(\frac12\)，  
+  右 = \(\frac{1}{90}\left(7\cdot0+32\cdot\frac14+12\cdot\frac12+32\cdot\frac34+7\cdot1\right) = \frac{1}{90}(0+8+6+24+7)=\frac{45}{90}=\frac12\)。  
+
+- \(f(x)=x^2\)：  
+  左 = \(\frac13\)，  
+  右 = \(\frac{1}{90}\left(7\cdot0+32\cdot\frac1{16}+12\cdot\frac14+32\cdot\frac9{16}+7\cdot1\right) = \frac{1}{90}(0+2+3+18+7)=\frac{30}{90}=\frac13\)。  
+
+- \(f(x)=x^3\)：  
+  左 = \(\frac14\)，  
+  右 = \(\frac{1}{90}\left(7\cdot0+32\cdot\frac1{64}+12\cdot\frac18+32\cdot\frac{27}{64}+7\cdot1\right) = \frac{1}{90}\left(0+\frac12+\frac32+\frac{27}{2}+7\right)\)  
+  \(= \frac{1}{90}\cdot\frac{45}{2} = \frac{45}{180} = \frac14\)。  
+
+- \(f(x)=x^4\)：  
+  左 = \(\frac15\)，  
+  右 = \(\frac{1}{90}\left(7\cdot0+32\cdot\frac1{256}+12\cdot\frac1{16}+32\cdot\frac{81}{256}+7\cdot1\right) = \frac{1}{90}\left(\frac18+\frac34+\frac{81}{8}+7\right)\)  
+  \(= \frac{1}{90}\left(\frac{41}{4}+\frac34+\frac{28}{4}\right) = \frac{1}{90}\cdot\frac{72}{4} = \frac{18}{90} = \frac15\)。  
+
+所有验证均成立，故该公式对任意次数不超过 \(4\) 的多项式精确成立。（注：该公式实为 \(n=4\) 的闭牛顿–科茨公式，其代数精度可达 \(5\) 次。）
+
+\subsection*{8}
+
+要求公式  
+\[
+\int_0^1 f(x)\,dx \approx A_0 f(0) + A_1 f(1)
+\]  
+对所有形如 \( f(x) = a e^x + b \cos(\pi x/2) \) 的函数精确成立。  
+分别取 \( f(x) = e^x \) 和 \( f(x) = \cos(\pi x/2) \) 代入，得方程组：  
+\[
+\begin{cases}
+\int_0^1 e^x dx = e-1 = A_0 + A_1 e, \\[4pt]
+\int_0^1 \cos(\pi x/2) dx = \frac{2}{\pi} = A_0.
+\end{cases}
+\]  
+解得  
+\[
+A_0 = \frac{2}{\pi}, \quad A_1 = \frac{e-1 - \frac{2}{\pi}}{e} = 1 - \frac{1}{e} - \frac{2}{\pi e}.
+\]  
+因此所求公式为  
+\[
+\int_0^1 f(x)\,dx \approx \frac{2}{\pi} f(0) + \left(1 - \frac{1}{e} - \frac{2}{\pi e}\right) f(1).
+\]
+
+\subsection*{9}
+要求公式  
+\[
+\int_0^{2\pi} f(x)\,dx = A_1 f(0) + A_2 f(\pi)
+\]  
+对所有形如 \( f(x) = a + b\cos x \) 的函数精确成立。  
+取 \( f(x)=1 \) 和 \( f(x)=\cos x \) 代入，得：  
+\[
+\begin{cases}
+\int_0^{2\pi} 1\,dx = 2\pi = A_1 + A_2, \\[4pt]
+\int_0^{2\pi} \cos x\,dx = 0 = A_1 - A_2.
+\end{cases}
+\]  
+解得 \( A_1 = A_2 = \pi \)。故公式为  
+\[
+\int_0^{2\pi} f(x)\,dx = \pi \bigl( f(0) + f(\pi) \bigr).
+\]  
+下证该公式对任意形如  
+\[
+f(x) = \sum_{k=0}^n \bigl[ a_k \cos(2k+1)x + b_k \sin kx \bigr]
+\]  
+的函数也精确成立。只需验证对每个基函数成立：
+
+对 \(\cos(2k+1)x\)：左端 \(\int_0^{2\pi} \cos(2k+1)x\,dx = 0\)；右端 \(\pi[\cos0 + \cos((2k+1)\pi)] = \pi[1 + (-1)] = 0\)。  
+
+对 \(\sin kx\)：左端 \(\int_0^{2\pi} \sin kx\,dx = 0\)；右端 \(\pi[\sin0 + \sin(k\pi)] = \pi[0+0] = 0\)。  
+
+故对所有基函数成立，由线性性，对它们的任意线性组合也成立。证毕。
+\subsection*{13}
+  
+要求确定 \(A, B, C\) 使得  
+\[
+\int_0^2 x f(x) \, dx \approx A f(0) + B f(1) + C f(2)
+\]  
+对所有次数尽可能高的多项式精确成立。  
+
+令 \(f(x) = 1, x, x^2\) 分别代入，得方程组：  
+\[
+\begin{cases}
+A + B + C = \int_0^2 x \, dx = 2, \\[4pt]
+B + 2C = \int_0^2 x^2 \, dx = \dfrac{8}{3}, \\[4pt]
+B + 4C = \int_0^2 x^3 \, dx = 4.
+\end{cases}
+\]  
+解得  
+\[
+C = \frac{2}{3},\quad B = \frac{4}{3},\quad A = 0.
+\]  
+此时公式为  
+\[
+\int_0^2 x f(x) \, dx \approx \frac{4}{3} f(1) + \frac{2}{3} f(2).
+\]  
+
+检查更高次：取 \(f(x) = x^3\)，左边 \(\int_0^2 x^4 dx = \frac{32}{5}\)，右边 \(\frac{4}{3} \cdot 1 + \frac{2}{3} \cdot 8 = \frac{20}{3} \neq \frac{32}{5}\)，故不精确。  
+因此，公式对次数不超过 2 的多项式精确成立，最大次数为 2。  
+
+\(A = 0,\ B = \dfrac{4}{3},\ C = \dfrac{2}{3}\)，最大次数为 2。
+
+
+\end{document}

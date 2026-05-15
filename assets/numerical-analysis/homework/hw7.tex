@@ -1,0 +1,432 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage[UTF8]{ctex}
+
+\newtheorem{problem}{问题}
+\newtheorem{solution}{解答}
+\title{数值分析第七周作业}
+\date{\today}
+\author{李佩优PB23000270}
+\geometry{a4paper,scale=0.8}
+
+\begin{document}
+\maketitle
+
+\section*{7.3}
+\subsection*{8}
+
+\[
+\int_{-1}^{1} x^2 f(x)\,dx \approx \sum_{i=1}^{n} A_i f(x_i)
+\]
+
+\subsubsection*{1. 构造关于权函数 \(w(x)=x^2\) 的正交多项式}
+
+在区间 \([-1,1]\) 上，定义内积  
+\[
+\langle p, q \rangle = \int_{-1}^{1} x^2 p(x) q(x)\,dx
+\]  
+计算前几个矩：
+\[
+\mu_k = \int_{-1}^{1} x^{k+2}\,dx = 
+\begin{cases}
+0, & k \text{ 为奇数}, \\[4pt]
+\dfrac{2}{k+3}, & k \text{ 为偶数}.
+\end{cases}
+\]
+
+利用 Gram–Schmidt 方法构造首一正交多项式：
+
+\begin{itemize}
+    \item \(\pi_0(x)=1\)
+    \item \(\pi_1(x)=x\)
+    \item \(\pi_2(x)=x^2 - \dfrac{3}{5}\)
+    \item \(\pi_3(x)=x^3 - \dfrac{5}{7}x\)
+\end{itemize}
+
+\subsubsection*{2. 求积节点与系数}
+
+\paragraph{情形 1：两个节点（对任意三次多项式精确）}
+
+取 \(n=1\)，节点为 \(\pi_2(x)\) 的根：
+\[
+x_1 = -\sqrt{\frac{3}{5}}, \qquad x_2 = \sqrt{\frac{3}{5}}
+\]
+由对称性 \(A_1 = A_2 = A\)，令公式对 \(f(x)=1\) 精确：
+\[
+A_1 + A_2 = \int_{-1}^{1} x^2\,dx = \frac{2}{3} \quad\Longrightarrow\quad 2A = \frac{2}{3} \;\Rightarrow\; A = \frac{1}{3}
+\]
+因此两点求积公式为：
+\[
+\boxed{\int_{-1}^{1} x^2 f(x)\,dx \approx \frac{1}{3}\,f\!\left(-\sqrt{\frac{3}{5}}\right) + \frac{1}{3}\,f\!\left(\sqrt{\frac{3}{5}}\right)}
+\]
+该公式对任意不超过三次的多项式精确成立。
+
+\paragraph{情形 2：三个节点（对任意五次多项式精确）}
+
+取 \(n=2\)，节点为 \(\pi_3(x)\) 的根：
+\[
+x_1 = -\sqrt{\frac{5}{7}}, \qquad x_2 = 0, \qquad x_3 = \sqrt{\frac{5}{7}}
+\]
+由对称性 \(A_1 = A_3 = A\)，\(A_2 = B\)。  
+令公式对 \(f(x)=1\) 和 \(f(x)=x^2\) 精确：
+
+\begin{itemize}
+    \item 对 \(f(x)=1\)：\(\displaystyle 2A + B = \int_{-1}^{1} x^2\,dx = \frac{2}{3}\)
+    \item 对 \(f(x)=x^2\)：\(\displaystyle 2A \cdot \frac{5}{7} + B \cdot 0 = \int_{-1}^{1} x^4\,dx = \frac{2}{5}\)
+\end{itemize}
+
+解得：
+\[
+\frac{10}{7}A = \frac{2}{5} \;\Rightarrow\; A = \frac{7}{25}, \qquad
+B = \frac{2}{3} - 2\cdot\frac{7}{25} = \frac{8}{75}
+\]
+因此三点求积公式为：
+\[
+\boxed{\int_{-1}^{1} x^2 f(x)\,dx \approx \frac{7}{25}\,f\!\left(-\sqrt{\frac{5}{7}}\right) + \frac{8}{75}\,f(0) + \frac{7}{25}\,f\!\left(\sqrt{\frac{5}{7}}\right)}
+\]
+该公式对任意不超过五次的多项式精确成立。
+
+\subsection*{16}
+
+要构造一个数值积分近似公式，使用 \( f(0) \)、\( f'(-1) \) 和 \( f''(1) \) 来逼近积分 \( \int_{-1}^1 f(x)\,dx \)，设近似公式的形式为：
+\[
+\int_{-1}^1 f(x)\,dx \approx A f(0) + B f'(-1) + C f''(1)
+\]
+为了使该公式对所有二次多项式精确成立，我们依次代入多项式 \( f(x) = 1, x, x^2 \) 来确定系数 \( A, B, C \)。
+
+\begin{enumerate}
+    \item 当 \( f(x) = 1 \) 时：
+    \begin{itemize}
+        \item 左端：\( \int_{-1}^1 1\,dx = 2 \)
+        \item 右端：\( A \cdot 1 + B \cdot 0 + C \cdot 0 = A \)
+        \item 因此 \( A = 2 \)。
+    \end{itemize}
+    \item 当 \( f(x) = x \) 时：
+    \begin{itemize}
+        \item 左端：\( \int_{-1}^1 x\,dx = 0 \)
+        \item 右端：\( A \cdot 0 + B \cdot 1 + C \cdot 0 = B \)
+        \item 因此 \( B = 0 \)。
+    \end{itemize}
+    \item 当 \( f(x) = x^2 \) 时：
+    \begin{itemize}
+        \item 左端：\( \int_{-1}^1 x^2\,dx = \frac{2}{3} \)
+        \item 右端：\( A \cdot 0^2 + B \cdot f'(-1) + C \cdot f''(1) \)
+        \item 计算导数：\( f'(x) = 2x \)，\( f'(-1) = -2 \)；\( f''(x) = 2 \)，\( f''(1) = 2 \)。
+        \item 右端变为：\( 2 \cdot 0 + 0 \cdot (-2) + C \cdot 2 = 2C \)
+        \item 由 \( 2C = \frac{2}{3} \) 得 \( C = \frac{1}{3} \)。
+    \end{itemize}
+\end{enumerate}
+
+因此，所求的近似公式为：
+\[
+\int_{-1}^1 f(x)\,dx \approx 2f(0) + \frac{1}{3}f''(1)
+\]
+
+\paragraph{检验该公式对三次多项式是否精确成立：}
+取三次多项式 \( f(x) = x^3 \)。
+\begin{itemize}
+    \item 左端：\( \int_{-1}^1 x^3\,dx = 0 \)。
+    \item 右端：\( 2 \cdot 0^3 + \frac{1}{3} f''(1) \)。
+    其中 \( f''(x) = 6x \)，\( f''(1) = 6 \)，故右端为 \( \frac{1}{3} \times 6 = 2 \)。
+    \item 左端 \( 0 \neq 2 \) 右端，所以该公式对三次多项式不精确成立。
+\end{itemize}
+
+原因：该近似公式仅利用了三个信息条件（函数值、一阶导数值、二阶导数值），所确定的三个系数最多只能保证对次数不超过 2 的多项式完全精确。对于三次多项式，由于没有足够的自由度去匹配更高阶的项，其误差项一般不为零，因此不能精确成立。此外，该公式对奇函数 \( x^3 \) 不具有对称抵消的性质，导致积分值为 0 而近似值非零。
+
+\subsection*{21}
+
+考虑公式
+\[
+\int_{-1}^1 f(x)\,dx \approx A f\!\left(-\sqrt{\frac{3}{5}}\right) + B f(0) + C f\!\left(\sqrt{\frac{3}{5}}\right)
+\]
+
+\paragraph{a. 待定系数法}
+
+假设该公式对次数不超过 2 的多项式精确成立，依次取 \(f(x) = 1, x, x^2\)，得到方程组：
+
+\begin{enumerate}
+    \item \(f(x)=1\)：
+    \[
+    \int_{-1}^1 1\,dx = 2,\quad \text{右端} = A\cdot 1 + B\cdot 1 + C\cdot 1 = A+B+C
+    \]
+    即
+    \[
+    A + B + C = 2
+    \]
+
+    \item \(f(x)=x\)：
+    \[
+    \int_{-1}^1 x\,dx = 0,\quad \text{右端} = A\left(-\sqrt{\frac{3}{5}}\right) + B\cdot 0 + C\left(\sqrt{\frac{3}{5}}\right) = (C-A)\sqrt{\frac{3}{5}}
+    \]
+    即
+    \[
+    (C-A)\sqrt{\frac{3}{5}} = 0 \quad\Longrightarrow\quad C = A
+    \]
+
+    \item \(f(x)=x^2\)：
+    \[
+    \int_{-1}^1 x^2\,dx = \frac{2}{3},\quad \text{右端} = A\left(\frac{3}{5}\right) + B\cdot 0 + C\left(\frac{3}{5}\right) = \frac{3}{5}(A+C)
+    \]
+    即
+    \[
+    \frac{3}{5}(A+C) = \frac{2}{3}
+    \]
+\end{enumerate}
+
+由第2式 \(C=A\)，代入第3式：
+\[
+\frac{3}{5}(2A) = \frac{2}{3} \;\Longrightarrow\; \frac{6}{5}A = \frac{2}{3} \;\Longrightarrow\; A = \frac{5}{9}
+\]
+从而 \(C = \frac{5}{9}\)。代入第1式：
+\[
+\frac{5}{9} + B + \frac{5}{9} = 2 \;\Longrightarrow\; B = \frac{8}{9}
+\]
+因此待定系数为：
+\[
+\boxed{A = \frac{5}{9},\quad B = \frac{8}{9},\quad C = \frac{5}{9}}
+\]
+
+\paragraph{b. 牛顿–科茨观点下的积分表达式}
+
+从拉格朗日插值多项式出发，设节点为 \(x_0=-\sqrt{\frac{3}{5}},\,x_1=0,\,x_2=\sqrt{\frac{3}{5}}\)，对应的拉格朗日基函数为
+\[
+L_0(x)=\frac{(x-x_1)(x-x_2)}{(x_0-x_1)(x_0-x_2)},\quad
+L_1(x)=\frac{(x-x_0)(x-x_2)}{(x_1-x_0)(x_1-x_2)},\quad
+L_2(x)=\frac{(x-x_0)(x-x_1)}{(x_2-x_0)(x_2-x_1)}
+\]
+则系数为基函数在 \([-1,1]\) 上的积分：
+\[
+A = \int_{-1}^1 L_0(x)\,dx,\quad
+B = \int_{-1}^1 L_1(x)\,dx,\quad
+C = \int_{-1}^1 L_2(x)\,dx
+\]
+直接计算这三个积分，将得到与 a 相同的结果。
+
+\subsection*{22}
+
+已知在标准区间 \([-1,1]\) 上的三点高斯–勒让德公式为：
+\[
+\int_{-1}^1 g(t)\,dt \approx \frac{5}{9}\,g\!\left(-\sqrt{\frac{3}{5}}\right) + \frac{8}{9}\,g(0) + \frac{5}{9}\,g\!\left(\sqrt{\frac{3}{5}}\right)
+\]
+对于一般区间 \([a,b]\) 上的积分 \(\int_a^b f(x)\,dx\)，作变量替换：
+\[
+x = \frac{b-a}{2}\,t + \frac{a+b}{2},\quad dx = \frac{b-a}{2}\,dt
+\]
+则
+\[
+\int_a^b f(x)\,dx = \frac{b-a}{2}\int_{-1}^1 f\!\left(\frac{b-a}{2}t + \frac{a+b}{2}\right) dt
+\]
+对右端的积分应用上述高斯公式，得到：
+\[
+\boxed{\int_a^b f(x)\,dx \approx \frac{b-a}{2}\left[ \frac{5}{9}\,f\!\left(\frac{b-a}{2}\left(-\sqrt{\frac{3}{5}}\right)+\frac{a+b}{2}\right) + \frac{8}{9}\,f\!\left(\frac{a+b}{2}\right) + \frac{5}{9}\,f\!\left(\frac{b-a}{2}\sqrt{\frac{3}{5}}+\frac{a+b}{2}\right) \right]}
+\]
+
+\paragraph{a. 计算 \(\displaystyle\int_0^{\frac{\pi}{2}} x\,dx\)}
+
+此处 \(a=0,\,b=\frac{\pi}{2}\)，则 \(\frac{b-a}{2}=\frac{\pi}{4},\;\frac{a+b}{2}=\frac{\pi}{4}\)，\(f(x)=x\)。  
+映射节点：
+\[
+x_1 = \frac{\pi}{4}\left(-\sqrt{\frac{3}{5}}\right) + \frac{\pi}{4} = \frac{\pi}{4}\left(1-\sqrt{\frac{3}{5}}\right)
+\]
+\[
+x_2 = \frac{\pi}{4}
+\]
+\[
+x_3 = \frac{\pi}{4}\left(\sqrt{\frac{3}{5}}\right) + \frac{\pi}{4} = \frac{\pi}{4}\left(1+\sqrt{\frac{3}{5}}\right)
+\]
+代入高斯公式：
+\[
+\begin{aligned}
+\int_0^{\frac{\pi}{2}} x\,dx &\approx \frac{\pi}{4}\left[ \frac{5}{9}\,x_1 + \frac{8}{9}\,x_2 + \frac{5}{9}\,x_3 \right] \\
+&= \frac{\pi}{4}\left[ \frac{5}{9}\cdot\frac{\pi}{4}\left(1-\sqrt{\frac{3}{5}}\right) + \frac{8}{9}\cdot\frac{\pi}{4} + \frac{5}{9}\cdot\frac{\pi}{4}\left(1+\sqrt{\frac{3}{5}}\right) \right] \\
+&= \frac{\pi^2}{16}\cdot\frac{1}{9}\left[ 5\left(1-\sqrt{\frac{3}{5}}\right) + 8 + 5\left(1+\sqrt{\frac{3}{5}}\right) \right] \\
+&= \frac{\pi^2}{144}\left(5 - 5\sqrt{\frac{3}{5}} + 8 + 5 + 5\sqrt{\frac{3}{5}}\right) \\
+&= \frac{\pi^2}{144}\times 18 = \frac{\pi^2}{8}
+\end{aligned}
+\]
+该结果等于精确积分值 \(\left[\frac{x^2}{2}\right]_0^{\frac{\pi}{2}}=\frac{\pi^2}{8}\)，验证了高斯三点公式对一次多项式（乃至三次多项式）精确成立。
+
+\paragraph{b. 计算 \(\displaystyle\int_0^4 \sin t\,dt\)}
+
+此时 \(a=0,\,b=4\)，则 \(\frac{b-a}{2}=2,\;\frac{a+b}{2}=2\)，\(f(t)=\sin t\)。  
+映射节点：
+\[
+t_1 = 2\left(-\sqrt{\frac{3}{5}}\right) + 2 = 2 - 2\sqrt{\frac{3}{5}}
+\]
+\[
+t_2 = 2
+\]
+\[
+t_3 = 2\left(\sqrt{\frac{3}{5}}\right) + 2 = 2 + 2\sqrt{\frac{3}{5}}
+\]
+代入公式：
+\[
+\begin{aligned}
+\int_0^4 \sin t\,dt &\approx 2\left[ \frac{5}{9}\sin(t_1) + \frac{8}{9}\sin(t_2) + \frac{5}{9}\sin(t_3) \right] \\
+&= \frac{2}{9}\left[ 5\sin\!\left(2-2\sqrt{\frac{3}{5}}\right) + 8\sin 2 + 5\sin\!\left(2+2\sqrt{\frac{3}{5}}\right) \right]
+\end{aligned}
+\]
+该结果即为近似值，其精确值为 \(\left[-\cos t\right]_0^4 = 1 - \cos 4\)。
+
+\subsection*{30}
+
+由第26、27题知，第二类切比雪夫多项式 \(U_n(x)\) 是区间 \([-1,1]\) 上关于权函数 \(w(x)=\sqrt{1-x^2}\) 的正交多项式族。  
+\(n\) 点高斯求积公式的节点为 \(U_n(x)\) 的零点，系数由相应积分给出。
+
+节点：  
+由 \(U_n(\cos\theta) = \frac{\sin((n+1)\theta)}{\sin\theta}\)，零点满足 \(\sin((n+1)\theta)=0\) 且 \(\sin\theta \neq 0\)，即  
+\[
+\theta_k = \frac{k\pi}{n+1}, \quad k=1,2,\dots,n.
+\]  
+对应节点  
+\[
+x_k = \cos\frac{k\pi}{n+1}, \quad k=1,2,\dots,n.
+\]
+
+系数：  
+对于权函数 \(w(x)=\sqrt{1-x^2}\)，\(n\) 点高斯求积系数为  
+\[
+A_k = \frac{\pi}{n+1}\sin^2\frac{k\pi}{n+1}, \quad k=1,2,\dots,n.
+\]  
+（可用公式 \(A_k = \int_{-1}^1 w(x)\ell_k(x)dx\) 及第二类切比雪夫多项式的性质导出，或直接由 \(\sum A_k = \pi/2\) 与离散正交性验证。）
+
+高斯求积公式：  
+\[
+\int_{-1}^1 f(x)\sqrt{1-x^2}\,dx \approx \sum_{k=1}^n \frac{\pi}{n+1}\sin^2\!\left(\frac{k\pi}{n+1}\right) f\!\left(\cos\frac{k\pi}{n+1}\right).
+\]  
+该公式对次数不超过 \(2n-1\) 的多项式精确成立。
+
+\subsection*{推导Gauss-Lobatto积分公式}
+
+推导Gauss-Lobatto积分公式，并证明系数\(A_i\)，\(i=0,\dots,n\)是正的。
+
+\paragraph{1. 公式形式与精度要求}
+
+考虑在 \([-1,1]\) 上构造具有 \(n+1\) 个节点的数值积分公式：
+\[
+\int_{-1}^{1} f(x) \,dx \approx \sum_{i=0}^{n} A_i f(x_i)
+\]
+其中要求包含区间端点：\(x_0 = -1\)，\(x_n = 1\)，其余节点 \(x_1,\dots,x_{n-1} \in (-1,1)\) 待定。我们希望该公式具有尽可能高的代数精度，即对一切次数不超过 \(2n-1\) 的多项式精确成立。
+
+\paragraph{2. 节点多项式的正交性条件}
+
+记全体节点的多项式为
+\[
+\omega(x) = \prod_{i=0}^{n} (x-x_i) = (x^2-1)\,p_{n-1}(x),
+\]
+其中 \(p_{n-1}(x) = \prod_{i=1}^{n-1} (x-x_i)\) 是 \(n-1\) 次首一多项式。
+
+设 \(q(x)\) 为任意次数 \(\le n-2\) 的多项式。由于 \(\deg(\omega q) \le (n+1)+(n-2) = 2n-1\)，求积公式对该乘积精确成立：
+\[
+\int_{-1}^{1} \omega(x) q(x) \,dx = \sum_{i=0}^{n} A_i \,\omega(x_i) q(x_i) = 0,
+\]
+因为 \(\omega(x_i)=0\) 对所有节点成立。于是我们得到正交条件：
+\[
+\int_{-1}^{1} \omega(x) q(x) \,dx = 0, \quad \forall\, \deg q \le n-2.
+\]
+这表明 \(\omega(x)\) 必须与所有次数不超过 \(n-2\) 的多项式在 \([-1,1]\) 上正交。
+
+\paragraph{3. 用 Legendre 多项式确定节点}
+
+已知 \(n\) 次 Legendre 多项式 \(P_n(x)\) 满足正交性：
+\[
+\int_{-1}^{1} P_n(x) r(x) \,dx = 0, \quad \forall\, \deg r \le n-1.
+\]
+考虑多项式 \((1-x^2)P_n'(x)\)，其度为 \(n+1\)。对任意 \(q(x)\) 满足 \(\deg q \le n-2\)，利用分部积分：
+\[
+\begin{aligned}
+\int_{-1}^{1} (1-x^2)P_n'(x) q(x) \,dx 
+&= \Big[ (1-x^2)P_n(x)q(x) \Big]_{-1}^{1} - \int_{-1}^{1} P_n(x) \frac{d}{dx}\big[(1-x^2)q(x)\big] \,dx \\
+&= 0 - 0 = 0.
+\end{aligned}
+\]
+边界项因为 \(1-x^2\) 在 \(\pm1\) 处为零而消失；求导后 \(\frac{d}{dx}[(1-x^2)q(x)]\) 的次数不超过 \(n-1\)，因此第二项积分由 \(P_n\) 的正交性为零。可见 \((1-x^2)P_n'(x)\) 恰好满足我们需要的正交条件。从而可取
+\[
+\omega(x) = c\,(1-x^2)P_n'(x),
+\]
+其中 \(c\) 为常数。它的根为 \(x=\pm1\) 以及 \(P_n'(x)=0\) 的 \(n-1\) 个实根。由 Legendre 多项式的性质，\(P_n'(x)\) 在 \((-1,1)\) 内恰有 \(n-1\) 个互异的单根，记为 \(x_1,\dots,x_{n-1}\)。这便给出了 Gauss-Lobatto 节点。
+
+\paragraph{4. 求积系数的确定}
+
+节点确定后，公式的系数 \(A_i\) 可通过积分 Lagrange 插值基函数得到。设
+\[
+L_i(x) = \prod_{\substack{j=0 \\ j \neq i}}^{n} \frac{x-x_j}{x_i-x_j}, \quad i=0,1,\dots,n,
+\]
+则 \(L_i(x)\) 是 \(n\) 次多项式，且满足 \(L_i(x_j) = \delta_{ij}\)。由于求积公式对任何次数 \(\le 2n-1\) 的多项式精确，而 \(\deg L_i = n \le 2n-1\)（当 \(n\ge 1\) 时），故有
+\[
+A_i = \int_{-1}^{1} L_i(x) \,dx, \quad i=0,1,\dots,n.
+\]
+这给出了系数的唯一确定表达式。
+
+\subsubsection*{证明系数 \(A_i > 0\)}
+
+为证明所有权重均为正，我们对内部节点与边界节点分别构造在 \([-1,1]\) 上非负、次数不超过 \(2n-1\) 的多项式，利用求积公式的精确性。
+
+\paragraph{内部节点（\(i = 1,\dots,n-1\)）}
+构造
+\[
+\varphi_i(x) = \left[ (1-x^2) \prod_{\substack{j=1 \\ j \neq i}}^{n-1} (x-x_j) \right]^2.
+\]
+该多项式的次数为 \(2 + 2(n-2) = 2n-2 \le 2n-1\)。显然 \(\varphi_i(x) \ge 0\) 且不恒为零。它在节点处的取值为：
+\begin{itemize}
+    \item \(x = \pm 1\)：\(\varphi_i(\pm 1) = 0\)；
+    \item \(x = x_j\) (\(j \neq i\))：\(\varphi_i(x_j) = 0\)；
+    \item \(x = x_i\)：\(\varphi_i(x_i) = \left[ (1-x_i^2) \prod_{j \neq i} (x_i-x_j) \right]^2 > 0\)。
+\end{itemize}
+
+由于 \(\deg \varphi_i = 2n-2 \le 2n-1\)，求积公式精确成立：
+\[
+0 < \int_{-1}^{1} \varphi_i(x) \,dx = \sum_{k=0}^{n} A_k \varphi_i(x_k) = A_i \varphi_i(x_i).
+\]
+因 \(\varphi_i(x_i) > 0\)，得 \(A_i > 0\)。
+
+\paragraph{边界节点 \(x_0 = -1\)}
+构造
+\[
+\varphi_0(x) = (1-x) \left[ \prod_{j=1}^{n-1} (x-x_j) \right]^2.
+\]
+它的次数为 \(1 + 2(n-1) = 2n-1\)，在 \([-1,1]\) 上由于 \(1-x \ge 0\) 而非负，且不恒为零。节点取值：
+\begin{itemize}
+    \item \(x = 1\)：\(\varphi_0(1) = 0\)；
+    \item \(x = x_j\) (\(j=1,\dots,n-1\))：\(\varphi_0(x_j) = 0\)；
+    \item \(x = -1\)：\(\varphi_0(-1) = 2 \left[ \prod_{j=1}^{n-1} (-1-x_j) \right]^2 > 0\)。
+\end{itemize}
+
+利用求积公式的 \(2n-1\) 次代数精度：
+\[
+0 < \int_{-1}^{1} \varphi_0(x) \,dx = \sum_{k=0}^{n} A_k \varphi_0(x_k) = A_0 \varphi_0(-1) \implies A_0 > 0.
+\]
+
+\paragraph{边界节点 \(x_n = 1\)}
+类似构造
+\[
+\varphi_n(x) = (1+x) \left[ \prod_{j=1}^{n-1} (x-x_j) \right]^2,
+\]
+次数 \(2n-1\)，非负。它在 \(x=-1\) 及内部节点处为零，在 \(x=1\) 处为正，同样可得 \(A_n > 0\)。
+
+综上，所有 Gauss-Lobatto 系数 \(A_i\) (\(i=0,1,\dots,n\)) 均为正数。
+
+\subsection*{积分误差控制}
+
+为了计算积分 \( I = \int_0^\infty \cos^2(x) e^{-x} \, dx \) 并保证数值结果的误差不超过 \(\delta = 10^{-3}\)，需要将积分拆分为两部分：
+\[
+I = \int_0^c \cos^2(x) e^{-x} \, dx + \int_c^\infty \cos^2(x) e^{-x} \, dx = l_1 + l_2
+\]
+选择 \(c\) 使得尾部积分 \(l_2\) 的绝对值不超过 \(\delta/2 = 5 \times 10^{-4}\)。
+
+由于 \(0 \le \cos^2(x) \le 1\)，有
+\[
+|l_2| = \int_c^\infty \cos^2(x) e^{-x} \, dx \le \int_c^\infty e^{-x} \, dx = e^{-c}
+\]
+令 \(e^{-c} \le 5 \times 10^{-4}\)，两边取自然对数得
+\[
+-c \le \ln(5 \times 10^{-4}) \implies c \ge -\ln(5 \times 10^{-4}) = \ln 2000
+\]
+计算近似值：\(\ln 2000 = \ln 2 + 3 \ln 10 \approx 0.6931 + 6.9078 = 7.6009\)。
+
+因此，取 \(c \ge 7.6009\) 即可满足误差要求。在实际计算中，可以取 \(c = 7.61\) 或 \(8\) 等不小于该值的数。
+
+答案：\(c \ge \ln 2000 \approx 7.601\)（或直接写 \(c = \ln 2000\)）。
+
+\end{document}

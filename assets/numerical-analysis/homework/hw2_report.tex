@@ -1,0 +1,140 @@
+\documentclass{article}
+\textheight 23.5cm \textwidth 15.8cm
+%\leftskip -1cm
+\topmargin -1.5cm \oddsidemargin 0.3cm \evensidemargin -0.3cm
+%\documentclass[final]{siamltex}
+
+\usepackage[UTF8]{ctex}
+
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+
+%\pagestyle{fancy} \lhead{FDM Homework Template} \chead{}
+%\rhead{\bfseries Yan XU}
+%
+%\lfoot{} \cfoot{} \rfoot{\thepage}
+%\renewcommand{\headrulewidth}{0.4pt}
+%\renewcommand{\footrulewidth}{0.4pt}
+%
+\title{HW2 说明文档}
+\author{李佩优}
+
+\begin{document}
+\maketitle
+
+\section{引言}
+
+本次作业的任务是对函数$f(x)=\frac{1}{1+25x^2}, x \in [-1,1]$ 构造牛顿插值多项式，并分析其$L^{\infty}$范数意义下的误差。
+
+\section{原理}
+
+牛顿插值多项式的构造方法如下：
+
+用给定插值点$x_1,x_2,...,x_n$，
+
+计算各级差商$f[x_i,..,x_j]$，
+
+构造牛顿插值多项式：
+\[
+\begin{aligned}
+N_n(x) = f[x_0] &+ f[x_0, x_1](x - x_0) \\
+&+ f[x_0, x_1, x_2](x - x_0)(x - x_1) \\
+&+ ... \\
+&+ f[x_0, x_1, ..., x_n](x - x_0)(x - x_1)...(x - x_{n-1})
+\end{aligned}
+\]
+
+\section{结果}
+
+(与hw1完全相同)
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{hw1_btty.png}
+\caption{在北太天元中运行N=10时的图像} \label{hw1_btty}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    % 第一个子图
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{result1.png}
+        \caption{matlab中运行输出}
+        \label{fig:sub1}
+    \end{subfigure}
+    \hfill % 在子图之间添加间距
+    % 第二个子图
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{result2.png}
+        \caption{北太天元中运行输出}
+        \label{fig:sub2}
+    \end{subfigure}
+    % 整个图集的标题
+    % \caption{这是包含两个子图的整体标题}
+    \label{fig:total}
+\end{figure}
+
+\begin{table}[htb]
+\caption{\label{table.label} 误差估计} \centering
+\bigskip
+\begin{small}
+\begin{tabular}{|c|cc|cc|}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+  n & grid(1)$ L^\infty$ 误差 & grid(2)$ L^\infty$ 误差 \\\hline
+5 &   4.327E-01  &  5.559E-01\\
+10&   1.916E+00  &  1.089E-01\\
+20&   5.827E+01  &  1.533E-02\\
+40&   7.869E+04  &  2.739E-04\\\hline
+\end{tabular}
+\end{small}
+\end{table}
+
+\newpage
+\section{讨论}
+
+(与hw1相同)
+
+从结果可以看出，等距节点的误差随着n的增加呈现爆炸式增长，
+而切比雪夫节点的误差则随着n的增加呈现指数级下降。
+这是因为等距节点在区间两端会出现Runge现象，导致插值多项式在区间两端出现剧烈震荡，从而导致误差增大。
+而切比雪夫节点则能够有效地避免Runge现象，使得插值多项式在整个区间内都能够较好地逼近原函数，从而使得误差较小。
+
+\section{与拉格朗日插值多项式的区别}
+
+两者的数学本质相同（最终都唯一确定同一个 \(n\) 次多项式），但在形式、计算效率上有显著区别。
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|p{4cm}|p{5cm}|p{5cm}|}
+\hline
+\textbf{比较维度} & \textbf{牛顿插值} & \textbf{拉格朗日插值} \\
+\hline
+\textbf{核心构造工具} & \textbf{差商}。利用差商表逐步求解系数。 & \textbf{基函数}。构造一组特殊的基函数 \(l_i(x)\) 进行线性组合。 \\
+\hline
+\textbf{计算效率与承袭性} & \textbf{高}。具有承袭性。当需要增加一个节点时，只需在原有公式上增加一个新项（新的差商乘以基函数），之前的计算结果依然有效。 & \textbf{低}。缺乏承袭性。所有基函数都需要重新计算，之前的工作完全作废。 \\
+\hline
+\textbf{多项式形式} & 形式类似\textbf{嵌套乘法}。例如：\(a_0 + a_1(x-x_0) + a_2(x-x_0)(x-x_1) + \cdots\) & 对称形式。每个基函数都包含所有节点，形式统一。 \\
+\hline
+\textbf{数值稳定性} & 相对较好（尤其在节点顺序调整时）。 & 相对敏感（基函数震荡较大）。 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\appendix
+\section{源代码}
+
+
+\small \hrule \verbatiminput{hw2.m} \hrule
+
+
+\end{document}

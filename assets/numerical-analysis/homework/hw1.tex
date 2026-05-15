@@ -1,0 +1,98 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage[UTF8]{ctex} % 用于中文支持，如果不需要中文，可以移除此行
+
+\newtheorem{problem}{问题}
+\newtheorem{solution}{解答}
+\title{数值分析第一周作业}
+\date{\today}
+\author{李佩优PB23000270}
+\geometry{a4paper,scale=0.8}
+\begin{document}
+\maketitle
+\section*{2}
+对于给定的函数$f(x)$，在n+1个指定的结点上次数$\leqslant n$的插值多项式$p$是唯一确定的。
+因此，存在一个映射$f\mapsto p$。用L标势这个映射，并证明
+$$Lf = \sum_{i=0}^{n} f(x_i) \ell_i$$
+再证明L是现行的，即$L(af+bg)=aLf+bLg$。
+\begin{proof}
+
+注意到拉格朗日基函数：$\ell_i(x)=\prod_{\substack{0\leq j\leq n\\ j\neq i}} \frac{x-x_j}{x_i-x_j}$满足：
+$j\neq i$时，$\ell_i(x_j)=0$; $\ell_i(x_i)=1$，且为n次多项式。
+于是，多项式$$p(x)=\sum_{i=0}^{n} f(x_i) \ell_i(x)$$
+在结点$x_i$处满足$$p(x_i)=\sum_{i=0}^{n} f(x_i) \ell_i(x_i)=f(x_i)$$，且其次数不超过n。
+因此$p$是满足条件的插值多项式，由插值多项式的唯一性可知$p$就是$Lf$，即$$Lf = \sum_{i=0}^{n} f(x_i) \ell_i.$$
+
+接下来证明L是线性的。
+对于任意的函数$f$和$g$，以及任意的常数$a$和$b$，
+考虑$L(af+bg)$,$\forall i, aLf(x_i)+bLg(x_i)=af(x_i)+bg(x_i)=(af+bg)(x_i)$，
+$\Rightarrow aLf+bLg$也是$af+bg$的插值多项式。由于插值多项式的唯一性可知$L(af+bg)=aLf+bLg$。
+
+\end{proof}
+\section*{3}
+G: $$Gf = \sum_{i=0}^{n}f(x_i)\ell_i^2$$
+\begin{proof}
+由$\ell_i$是n次多项式可知$\ell_i^2$是2n次多项式，因此$Gf$是次数不超过2n次的多项式。
+
+$\forall i\neq j, \ell_i(x_j)=0;\quad \ell_i(x_i)=1$;
+$\Rightarrow \forall i\neq j, \ell_i^2(x_j)=0;\quad \ell_i^2(x_i)=1$。
+$$\Rightarrow Gf(x_i)=\sum_{i=0}^{n}f(x_i)\ell_i^2(x_i)=f(x_i)$$
+因此$Gf$也是满足条件的插值多项式。
+
+f非负时，$\forall i, f(x_i)\geq 0$，
+$$\Rightarrow Gf(x)=\sum_{i=0}^{n}f(x_i)\ell_i^2(x)\geq 0$$
+因此$Gf$也是非负的。
+
+\end{proof}
+\section*{4}
+对每个次数最多是n次的多项式$q$，都有$Lq=q$。
+\begin{proof}
+假设$Lq\neq q$
+，那么$Lq-q$是一个次数不超过n次的多项式，并且在结点$x_i$处满足$(Lq-q)(x_i)=0$。
+因此$Lq-q$有n+1个不同的根，但其次数不超过n，这与多项式的根的个数不超过其次数的定理矛盾。
+因此$Lq=q$。
+\end{proof}
+\section*{5}
+证明对所有x,都有$$\sum_{i=0}^{n} \ell_i(x)=1$$
+\begin{proof}
+$\forall i\neq j, \ell_i(x_j)=0;\quad \ell_i(x_i)=1$;
+$\Rightarrow \forall i, \sum_{i=0}^{n} \ell_i(x_i)=1$。
+因此常函数1本身是一个次数不超过n的多项式，因此1是它的插值多项式。
+又由$\sum_{i=0}^{n} \ell_i(x)$是次数不超过n的多项式，
+$\Rightarrow 1=L(\sum_{i=0}^{n} \ell_i(x))=\sum_{i=0}^{n} \ell_i(x)$。
+即$\sum_{i=0}^{n} \ell_i(x)\equiv 1$。
+\end{proof}
+\section*{6}
+$\forall x ,\sum_{i=0}^{n} \ell_i(x)=1$,
+$\Rightarrow \sum_{i=0}^{n} f(x)\ell_i(x) = f(x)$。
+又有$p=Lf = \sum_{i=0}^{n} f(x_i) \ell_i$
+$\Rightarrow f(x)-p(x)=\sum_{i=0}^{n} (f(x)-f(x_i))\ell_i(x)$。
+\section*{8}
+对于给定的$p(0),p(1)$和$p'(\xi )$,其中$\xi$是任意预先给定的点。
+讨论求一个次数至多为2次的多项式问题。
+
+\begin{solution}
+令 \(p(x)=ax^2+bx+c\)，则由条件得
+\[
+c=\alpha,\quad a+b=\beta-\alpha,\quad 2a\xi+b=\gamma.
+\]
+解此方程组：
+
+- 当 \(\xi\neq\frac{1}{2}\) 时，有唯一解
+  \[
+  a=\frac{\gamma-(\beta-\alpha)}{2\xi-1},\quad b=\beta-\alpha-a,\quad c=\alpha,
+  \]
+  即
+  \[
+  p(x)=\frac{\gamma-(\beta-\alpha)}{2\xi-1}x^2+\left(\beta-\alpha-\frac{\gamma-(\beta-\alpha)}{2\xi-1}\right)x+\alpha.
+  \]
+
+- 当 \(\xi=\frac{1}{2}\) 时，方程组有解当且仅当 \(\gamma=\beta-\alpha\)。此时 \(a\) 可取任意常数，\(b=\beta-\alpha-a\)，\(c=\alpha\)，即解集为
+  \[
+  p(x)=ax^2+(\beta-\alpha-a)x+\alpha,\quad \forall a\in\mathbb{R}\ (\text{或 }\mathbb{C}).
+  \]
+  若 \(\gamma\neq\beta-\alpha\)，则无解。
+\end{solution}
+
+\end{document}

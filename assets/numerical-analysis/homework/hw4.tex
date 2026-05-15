@@ -1,0 +1,255 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage[UTF8]{ctex} % 用于中文支持，如果不需要中文，可以移除此行
+
+\newtheorem{problem}{问题}
+\newtheorem{solution}{解答}
+\title{数值分析第四周作业}
+\date{\today}
+\author{李佩优PB23000270}
+\geometry{a4paper,scale=0.8}
+\begin{document}
+\maketitle
+\section*{6.8}
+
+\subsection*{1}
+用上确界范数求出区间$[0,\pi/2]$上$\sin x $的最佳逼近函数$u(x)=\lambda x$，
+
+
+在区间 \([0, \pi/2]\) 上，用 \(u(x) = \lambda x\) 逼近 \(\sin x\)，上确界范数定义为 \(\|f\|_\infty = \max_{x \in [0, \pi/2]} |f(x)|\)。最佳逼近要求误差函数 \(e(x) = \sin x - \lambda x\) 的最大绝对值最小化。
+
+由于 \(\sin x\) 是凹函数，且 \(u(0)=0\)，最佳逼近应使误差在内部极值点 \(x_0\) 和右端点 \(x = \pi/2\) 处绝对值相等且符号相反。极值点满足 \(e'(x_0) = \cos x_0 - \lambda = 0\)，即 \(\lambda = \cos x_0\)。由条件 \(e(x_0) = -e(\pi/2)\) 得：
+\[
+\sin x_0 - x_0 \cos x_0 = \lambda \frac{\pi}{2} - 1 = \frac{\pi}{2} \cos x_0 - 1,
+\]
+整理得：
+\[
+\sin x_0 + 1 = \left( x_0 + \frac{\pi}{2} \right) \cos x_0.
+\]
+数值求解得 \(x_0 \approx 0.760\)，于是 \(\lambda = \cos x_0 \approx 0.725\)。因此最佳逼近函数为 \(u(x) \approx 0.725x\)，最大误差约为 \(0.138\)。
+
+\subsection*{2}
+用一般平方范数求解1
+
+平方范数定义为 \(\|f\|_2 = \left( \int_0^{\pi/2} f(x)^2 \, dx \right)^{1/2}\)。最小化 \(\int_0^{\pi/2} (\sin x - \lambda x)^2 \, dx\) 关于 \(\lambda\) 求导得：
+\[
+\int_0^{\pi/2} x \sin x \, dx = \lambda \int_0^{\pi/2} x^2 \, dx.
+\]
+计算积分：
+\[
+\int_0^{\pi/2} x \sin x \, dx = \left[ -x \cos x + \sin x \right]_0^{\pi/2} = 1,
+\quad
+\int_0^{\pi/2} x^2 \, dx = \frac{(\pi/2)^3}{3} = \frac{\pi^3}{24}.
+\]
+因此 \(\lambda = \frac{24}{\pi^3} \approx 0.774\)，最佳逼近为 \(u(x) = \frac{24}{\pi^3} x\)。
+
+
+\subsection*{3}
+假设我们要用一个次数$\leqslant n$的多项式去逼近一个偶函数，使用范数
+$||f||= {\int_{-1}^{1}(f(x))^2 dx}^{1/2}$
+证明：最佳逼近函数也是偶函数。
+
+设 \(f\) 是 \([-1,1]\) 上的偶函数，\(P_n\) 为次数不超过 \(n\) 的多项式空间。对于任意 \(p \in P_n\)，将其分解为偶部 \(p_e(x) = \frac{p(x)+p(-x)}{2}\) 和奇部 \(p_o(x) = \frac{p(x)-p(-x)}{2}\)，则 \(p = p_e + p_o\)，且 \(p_e\) 是偶多项式，\(p_o\) 是奇多项式。由于 \(f\) 是偶函数，有：
+\[
+\|f - p\|_2^2 = \int_{-1}^1 (f - p_e - p_o)^2 \, dx = \int_{-1}^1 (f - p_e)^2 \, dx + \int_{-1}^1 p_o^2 \, dx,
+\]
+因为 \(f - p_e\) 是偶函数，\(p_o\) 是奇函数，它们的乘积在对称区间上积分为零。于是 \(\|f - p\|_2^2 \ge \|f - p_e\|_2^2\)，等号成立当且仅当 \(p_o = 0\)。因此最佳逼近多项式必为偶函数。
+
+\subsection*{8}
+在正交多项式的三项递归公式中，假设内积是$<f,g>=\int_{-a}^{a} f(x)g(x)w(x)dx$,
+其中$w$是偶函数，证明：$a_n=0$。并证明若$n$是偶数，则$p_n$是偶函数；若$n$是奇数，则$p_n$是奇函数。、
+
+
+考虑内积 \(\langle f, g \rangle = \int_{-a}^a f(x)g(x)w(x) \, dx\)，其中 \(w\) 是偶函数。正交多项式序列 \(\{p_n\}\) 满足三项递归：
+\[
+p_{n+1}(x) = (x - a_n)p_n(x) - b_n p_{n-1}(x),
+\]
+其中
+\[
+a_n = \frac{\langle x p_n, p_n \rangle}{\langle p_n, p_n \rangle}, \quad b_n = \frac{\langle p_n, p_n \rangle}{\langle p_{n-1}, p_{n-1} \rangle}.
+\]
+由于 \(w\) 偶，区间对称，易证 \(p_0\) 为偶函数（常数），\(p_1\) 为奇函数（线性）。假设 \(p_n\) 有确定的奇偶性，则 \(x p_n\) 的奇偶性相反，从而 \(\langle x p_n, p_n \rangle = \int_{-a}^a x p_n(x)^2 w(x) \, dx\) 的被积函数为奇函数，积分为零，故 \(a_n = 0\)。由递归公式 \(p_{n+1} = x p_n - b_n p_{n-1}\)，结合归纳法可得：若 \(n\) 为偶数，则 \(p_n\) 为偶函数；若 \(n\) 为奇数，则 \(p_n\) 为奇函数。因此对所有 \(n\)，\(a_n = 0\)，且 \(p_n\) 的奇偶性由次数决定。
+
+
+\subsection*{14}
+利用内积$<u,v>=\int_{-1}^{1}u(x)v(x)dx$，假设把格拉姆-施密特过程应用在
+函数序列$x\mapsto (x^2-1)x^k(k=0,1,2,...)$上。证明：如果得到的标准正交序列经过重新规范后构成首一多项式序列，
+那么这个序列满足下列形式的三角递归关系：$q_{n+1}(x)=xq_{n}(x)-b_nq_{n-1}(x)$
+
+给定内积 \(\langle u,v\rangle = \int_{-1}^{1} u(x)v(x)\,dx\)，对序列 \(f_k(x) = (x^2-1)x^k\ (k=0,1,2,\dots)\) 施行 Gram-Schmidt 过程，得到正交多项式序列，再乘以常数使其成为首一多项式序列，记为 \(\{q_n\}\)。注意 \(f_k\) 的奇偶性：当 \(k\) 为偶数时 \(f_k\) 为偶函数，\(k\) 为奇数时为奇函数。Gram-Schmidt 过程保持奇偶性，故 \(q_n\) 与 \(x^n\) 同奇偶（因 \(f_n\) 与 \(x^n\) 同奇偶，且投影仅保留同奇偶项）。于是 \(q_n\) 为偶函数当 \(n\) 为偶数，奇函数当 \(n\) 为奇数。  
+对于首一正交多项式序列，一般有三项递推：
+\[
+x q_n(x) = q_{n+1}(x) + a_n q_n(x) + b_n q_{n-1}(x),
+\]
+其中 \(a_n = \dfrac{\langle x q_n, q_n \rangle}{\langle q_n, q_n \rangle}\)。由于 \(x q_n\) 与 \(q_n\) 奇偶性相反，且内积在对称区间上奇偶相异时为零，故 \(a_n = 0\)。因此递推式简化为
+\[
+q_{n+1}(x) = x q_n(x) - b_n q_{n-1}(x),
+\]
+其中 \(b_n = \dfrac{\langle q_n, q_n \rangle}{\langle q_{n-1}, q_{n-1} \rangle}\)（符号由递推形式决定，实际 \(b_n > 0\)）。此即所需证明的三项递归关系。
+
+
+\subsection*{18}
+
+定理7 (正交投影定理) 的证明
+
+设 \(H\) 为内积空间，\(U_n = \operatorname{span}\{u_1,\dots,u_n\}\) 是有限维子空间，\(P_n: H \to U_n\) 为正交投影，即对任意 \(f\in H\)，\(P_n f\) 是 \(U_n\) 中满足 \(f - P_n f \perp U_n\) 的唯一元素。
+
+1. 线性与值域：由定义，\(P_n\) 是线性算子（投影的线性性可验证），且对任意 \(f\)，\(P_n f \in U_n\)；反之，对任意 \(u\in U_n\)，取 \(f=u\) 得 \(P_n u = u\)，故 \(\operatorname{Im}(P_n)=U_n\)。
+
+2. 幂等性：对任意 \(f\)，\(P_n f \in U_n\)，故 \(P_n(P_n f)=P_n f\)，即 \(P_n^2 = P_n\)。
+
+3. 正交性：由投影定义直接得到 \(f - P_n f \perp U_n\)。
+
+4. 最佳逼近：对任意 \(u\in U_n\)，有  
+   \[
+   f - u = (f - P_n f) + (P_n f - u),
+   \]  
+   其中 \(f-P_n f \perp U_n\) 而 \(P_n f - u \in U_n\)，故两者正交。由勾股定理，
+   \[
+   \|f-u\|^2 = \|f-P_n f\|^2 + \|P_n f - u\|^2 \ge \|f-P_n f\|^2,
+   \]  
+   等号成立当且仅当 \(u = P_n f\)，因此 \(P_n f\) 是 \(f\) 在 \(U_n\) 中的最佳逼近。
+
+5. 自伴性：对任意 \(f,g\in H\)，分解 \(f = P_n f + f_\perp\)，\(g = P_n g + g_\perp\)，其中 \(f_\perp,g_\perp \perp U_n\)。则  
+   \[
+   \langle P_n f, g \rangle = \langle P_n f, P_n g + g_\perp \rangle = \langle P_n f, P_n g \rangle,
+   \]  
+   \[
+   \langle f, P_n g \rangle = \langle P_n f + f_\perp, P_n g \rangle = \langle P_n f, P_n g \rangle,
+   \]  
+   故 \(\langle P_n f, g \rangle = \langle f, P_n g \rangle\)，即 \(P_n\) 自伴。
+
+\subsection*{21}
+
+推导勒让德多项式 \(p_3(x), p_4(x), p_5(x)\)，这些多项式是区间 \([-1, 1]\) 上权函数 \(w(x)=1\) 的首一正交多项式。
+通过 Gram-Schmidt 正交化过程，从幂函数 \(1, x, x^2, \ldots\) 出发，可逐步得到。
+
+取内积定义
+\[
+\langle f, g \rangle = \int_{-1}^1 f(x) g(x) \, dx.
+\]
+
+基函数正交化
+
+1. \(p_0(x) = 1\)，归一化常数 \(\langle 1, 1 \rangle = 2\)。
+2. \(p_1(x) = x\)，因为 \(\langle x, 1 \rangle = 0\)，所以 \(p_1(x) = x\)，\(\langle x, x \rangle = \frac{2}{3}\)。
+3. \(p_2(x) = x^2 - \frac{\langle x^2, 1 \rangle}{\langle 1, 1 \rangle} \cdot 1 - \frac{\langle x^2, x \rangle}{\langle x, x \rangle} \cdot x\)。计算：
+   \[
+   \langle x^2, 1 \rangle = \int_{-1}^1 x^2 \, dx = \frac{2}{3}, \quad \frac{\langle x^2, 1 \rangle}{\langle 1, 1 \rangle} = \frac{2/3}{2} = \frac{1}{3},
+   \]
+   \[
+   \langle x^2, x \rangle = \int_{-1}^1 x^3 \, dx = 0,
+   \]
+   所以 \(p_2(x) = x^2 - \frac{1}{3}\)。
+4. \(p_3(x) = x^3 - \frac{\langle x^3, 1 \rangle}{\langle 1, 1 \rangle} \cdot 1 - \frac{\langle x^3, x \rangle}{\langle x, x \rangle} \cdot x - \frac{\langle x^3, p_2 \rangle}{\langle p_2, p_2 \rangle} \cdot p_2\)。计算：
+   \[
+   \langle x^3, 1 \rangle = \int_{-1}^1 x^3 \, dx = 0,
+   \]
+   \[
+   \langle x^3, x \rangle = \int_{-1}^1 x^4 \, dx = \frac{2}{5}, \quad \frac{\langle x^3, x \rangle}{\langle x, x \rangle} = \frac{2/5}{2/3} = \frac{3}{5},
+   \]
+   \[
+   \langle x^3, p_2 \rangle = \int_{-1}^1 x^3 \left( x^2 - \frac{1}{3} \right) dx = \int_{-1}^1 \left( x^5 - \frac{1}{3} x^3 \right) dx = 0 \quad (\text{奇函数}),
+   \]
+   所以 \(p_3(x) = x^3 - \frac{3}{5}x\)。
+5. \(p_4(x) = x^4 - \frac{\langle x^4, 1 \rangle}{\langle 1, 1 \rangle} \cdot 1 - \frac{\langle x^4, x \rangle}{\langle x, x \rangle} \cdot x - \frac{\langle x^4, p_2 \rangle}{\langle p_2, p_2 \rangle} \cdot p_2 - \frac{\langle x^4, p_3 \rangle}{\langle p_3, p_3 \rangle} \cdot p_3\)。由于奇偶性，\(\langle x^4, x \rangle = 0\)，\(\langle x^4, p_3 \rangle = 0\)（\(x^4\) 偶，\(p_3\) 奇），只需计算：
+   \[
+   \langle x^4, 1 \rangle = \int_{-1}^1 x^4 \, dx = \frac{2}{5}, \quad \frac{\langle x^4, 1 \rangle}{\langle 1, 1 \rangle} = \frac{2/5}{2} = \frac{1}{5},
+   \]
+   \[
+   \langle x^4, p_2 \rangle = \int_{-1}^1 x^4 \left( x^2 - \frac{1}{3} \right) dx = \int_{-1}^1 \left( x^6 - \frac{1}{3} x^4 \right) dx = \left( \frac{2}{7} - \frac{1}{3} \cdot \frac{2}{5} \right) = \frac{2}{7} - \frac{2}{15} = \frac{30-14}{105} = \frac{16}{105},
+   \]
+   \[
+   \langle p_2, p_2 \rangle = \int_{-1}^1 \left( x^2 - \frac{1}{3} \right)^2 dx = \int_{-1}^1 \left( x^4 - \frac{2}{3} x^2 + \frac{1}{9} \right) dx = \frac{2}{5} - \frac{2}{3} \cdot \frac{2}{3} + \frac{2}{9} = \frac{2}{5} - \frac{4}{9} + \frac{2}{9} = \frac{2}{5} - \frac{2}{9} = \frac{18-10}{45} = \frac{8}{45},
+   \]
+   \[
+   \frac{\langle x^4, p_2 \rangle}{\langle p_2, p_2 \rangle} = \frac{16/105}{8/45} = \frac{16}{105} \cdot \frac{45}{8} = \frac{2}{105} \cdot 45 = \frac{90}{105} = \frac{6}{7},
+   \]
+   所以 \(p_4(x) = x^4 - \frac{1}{5} - \frac{6}{7} \left( x^2 - \frac{1}{3} \right) = x^4 - \frac{6}{7}x^2 + \left( \frac{6}{7} \cdot \frac{1}{3} - \frac{1}{5} \right) = x^4 - \frac{6}{7}x^2 + \left( \frac{2}{7} - \frac{1}{5} \right) = x^4 - \frac{6}{7}x^2 + \frac{10-7}{35} = x^4 - \frac{6}{7}x^2 + \frac{3}{35}\)。
+6. \(p_5(x)\) 类似可得，利用奇偶性简化计算，最终得到 \(p_5(x) = x^5 - \frac{10}{9}x^3 + \frac{5}{21}x\)。
+
+
+\section*{6.9}
+
+\subsection*{2}
+求出一级多项式在区间 \([0, 1]\) 上最佳逼近函数 \(\sqrt{x}\)
+
+设一次多项式为 \(p(x) = ax + b\)，需要求 \(a, b\) 使得 \(\max_{0 \le x \le 1} |\sqrt{x} - (ax + b)|\) 最小。由切比雪夫逼近理论，最佳逼近多项式在三个点处达到等幅交错误差。考虑误差函数 \(e(x) = \sqrt{x} - ax - b\)。
+
+由于 \(\sqrt{x}\) 是凹函数，最佳逼近直线应使误差在端点 \(x=0,1\) 处相等且与内部某点 \(t \in (0,1)\) 处符号相反。设
+\[
+e(0) = -E, \quad e(t) = E, \quad e(1) = -E,
+\]
+其中 \(E > 0\)。由 \(e(0) = -b = -E\) 得 \(b = E\)。由 \(e(1) = 1 - a - b = -E\) 得 \(1 - a - E = -E\)，即 \(a = 1\)。再令 \(e'(t) = 0\)，即 \(\frac{1}{2\sqrt{t}} - a = 0\)，得 \(\frac{1}{2\sqrt{t}} = 1\)，故 \(t = \frac{1}{4}\)。代入 \(e(t) = \sqrt{t} - t - E = E\)，得 \(\frac{1}{2} - \frac{1}{4} = 2E\)，即 \(E = \frac{1}{8}\)。因此最佳逼近多项式为
+\[
+p(x) = x + \frac{1}{8}.
+\]
+此时最大误差为 \(\frac{1}{8}\)。
+
+\subsection*{5}
+在空间 \(C[0,1]\) 中，用零次多项式子空间 \(\Pi_0\) 最佳逼近 \(f\)
+
+\(\Pi_0\) 中的元素为常数函数 \(c\)。对于 \(f \in C[0,1]\)，定义
+\[
+M(f) = \max_{0 \le x \le 1} f(x), \quad m(f) = \min_{0 \le x \le 1} f(x).
+\]
+用常数 \(c\) 逼近 \(f\) 的最大误差为 \(\max_{0 \le x \le 1} |f(x) - c|\)。该误差的最小值在 \(c = \frac{M(f) + m(f)}{2}\) 时达到，且最小误差为 \(\frac{M(f) - m(f)}{2}\)。这是因为：
+
+若 \(c\) 小于 \(\frac{M+m}{2}\)，则上偏差 \(M-c\) 大于下偏差 \(c-m\)，最大误差为 \(M-c\)，且 \(M-c > \frac{M-m}{2}\)；
+
+若 \(c\) 大于 \(\frac{M+m}{2}\)，则下偏差 \(c-m\) 更大；
+
+当 \(c = \frac{M+m}{2}\) 时，上下偏差相等，均为 \(\frac{M-m}{2}\)。
+因此，\(\Pi_0\) 中 \(f\) 的最佳逼近元为常数函数 \(\frac{M(f)+m(f)}{2}\)。
+
+\subsection*{8}
+证明：区间 \([-1,1]\) 上函数 \(\cosh x\) 的最佳逼近二次多项式是 \(a + b x^2\)，其中 \(b = \cosh 1 - 1\)，\(a\) 满足
+\[
+2a = 1 + \cosh t - t^2 b, \quad \sinh t = 2b t.
+\]
+
+证：由于 \(\cosh x\) 是偶函数，最佳逼近二次多项式也应为偶函数，故设为 \(p(x) = a + b x^2\)。考虑误差函数 \(e(x) = \cosh x - a - b x^2\)，定义在 \([-1,1]\) 上，其奇偶性相同，只需考察 \([0,1]\)。由切比雪夫定理，最佳逼近时误差在三个点 \(x=0, t, 1\)（其中 \(0 < t < 1\)）处达到等幅交错。设
+\[
+e(0) = -E, \quad e(t) = E, \quad e(1) = -E, \quad E > 0.
+\]
+由 \(e(0) = 1 - a = -E\) 得 \(a = 1 + E\)。由 \(e(1) = \cosh 1 - a - b = -E\) 得
+\[
+\cosh 1 - (1+E) - b = -E \quad \Rightarrow \quad b = \cosh 1 - 1.
+\]
+由 \(e(t) = \cosh t - a - b t^2 = E\) 得
+\[
+\cosh t - (1+E) - b t^2 = E \quad \Rightarrow \quad \cosh t - 1 - b t^2 = 2E.
+\]
+又由导数条件 \(e'(t) = \sinh t - 2b t = 0\) 得 \(\sinh t = 2b t\)。将 \(a = 1+E\) 代入 \(2a = 2 + 2E\)，并利用上式得
+\[
+2a = 2 + (\cosh t - 1 - b t^2) = 1 + \cosh t - b t^2.
+\]
+因此 \(a\) 和 \(t\) 满足
+\[
+2a = 1 + \cosh t - t^2 b, \quad \sinh t = 2b t.
+\]
+由于 \(b = \cosh 1 - 1 > 0\)，方程 \(\sinh t = 2b t\) 在 \((0,1)\) 内有唯一解（因函数 \(g(t)=\sinh t - 2b t\) 满足 \(g(0)=0\)，\(g'(0)=1-2b<0\)，\(g(1)>0\)），从而存在唯一的 \(t\) 和相应的 \(a\)。由此得到的 \(p(x)=a+bx^2\) 即为最佳逼近二次多项式。
+
+\subsection*{16}
+
+设$f= a_0T_0+a_1T_1 + \cdots + a_{n+1}T_{n+1}$。
+其中$T_k$是切比雪夫多项式。
+证明：空间$\prod_n$中在区间$[-1,1]$上确界范数的$f$的最佳逼近是$a_0T_0+a_1T_1 + \cdots + a_{n}T_{n}$
+
+
+设 $f = a_0 T_0 + a_1 T_1 + \cdots + a_{n+1} T_{n+1}$，其中 $T_k$ 为切比雪夫多项式，定义在区间 $[-1,1]$ 上。考虑多项式 $p_n = a_0 T_0 + a_1 T_1 + \cdots + a_n T_n \in \prod_n$，则误差函数为 $e(x) = f(x) - p_n(x) = a_{n+1} T_{n+1}(x)$。
+
+切比雪夫多项式 $T_{n+1}(x)$ 在 $[-1,1]$ 上有如下性质：
+- $\|T_{n+1}\|_\infty = \max_{x\in[-1,1]} |T_{n+1}(x)| = 1$；
+- 在点 $x_k = \cos\left(\frac{k\pi}{n+1}\right)$，$k=0,1,\dots,n+1$ 处，$T_{n+1}(x_k) = (-1)^k$。
+
+因此，$e(x)$ 在 $n+2$ 个点 $x_0, x_1, \dots, x_{n+1}$ 上满足 $|e(x_k)| = |a_{n+1}|$，且 $e(x_k)$ 的符号交替变化。
+
+根据切比雪夫交替定理（Chebyshev alternation theorem），若一个 $n$ 次多项式 $p_n$ 使得误差函数 $f-p_n$ 在至少 $n+2$ 个点上达到最大绝对值且符号交替，则 $p_n$ 是 $f$ 在 $\prod_n$ 中的最佳一致逼近。由于 $e(x)$ 满足该条件，故 $p_n$ 即为所求的最佳逼近。
+
+若 $a_{n+1}=0$，则 $f$ 本身属于 $\prod_n$，最佳逼近即为自身，结论同样成立。
+
+综上，$f$ 在 $\prod_n$ 中的最佳一致逼近为 $a_0 T_0 + a_1 T_1 + \cdots + a_n T_n$。
+
+\end{document}

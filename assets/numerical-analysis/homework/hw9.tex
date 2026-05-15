@@ -1,0 +1,186 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage[UTF8]{ctex}
+
+\newtheorem{problem}{问题}
+\newtheorem{solution}{解答}
+\title{数值分析第九周作业}
+\date{\today}
+\author{李佩优PB23000270}
+\geometry{a4paper,scale=0.8}
+
+\begin{document}
+\maketitle
+
+\section*{8.1}
+\subsection*{5}
+对于初值问题 \(x' = f(t,x),\; x(0)=0\)，
+当 \(\frac{\mathrm{d}x}{\mathrm{d}t} \neq 0\) 时，
+可翻转方程得到 \(\frac{\mathrm{d}t}{\mathrm{d}x} = \frac{1}{f(t,x)}\)，将 \(x\) 视为自变量、\(t\) 为因变量求解。
+
+a. \(f(t,x) = x^{-2}\),翻转方程得到：\(\frac{\mathrm{d}t}{\mathrm{d}x} = x^{2}\)。  \\
+积分得：\(t = \frac{1}{3}x^{3} + C\)。  \\
+代入初值 \(x(0)=0\) 得 \(0 = 0 + C \Rightarrow C = 0\)。  \\
+于是 \(t = \frac{1}{3}x^{3}\)，即解为 \(x(t) = (3t)^{1/3},\quad t \in \mathbb{R}\)。  
+
+b. \(f(t,x) = 1+x^{2}\),
+翻转方程得到：\(\frac{\mathrm{d}t}{\mathrm{d}x} = \frac{1}{1+x^{2}}\)。  \\
+积分得：\(t = \arctan x + C\)。  \\
+由 \(x(0)=0\) 得 \(C=0\)。  \\
+故解为 \(x(t) = \tan t\)，最大存在区间为 \(t \in \left(-\frac{\pi}{2}, \frac{\pi}{2}\right)\)。
+
+c. \(f(t,x) = (\sin x + \cos x)^{-1}\),
+翻转方程：\(\frac{\mathrm{d}t}{\mathrm{d}x} = \sin x + \cos x\)。  \\
+积分得：\(t = -\cos x + \sin x + C\)。  \\
+由 \(x(0)=0\) 得 \(0 = -1 + 0 + C \Rightarrow C = 1\)。 \\ 
+因此解由隐式方程给出：
+\[
+t = \sin x - \cos x + 1.
+\]
+分母 \(\sin x + \cos x = \sqrt{2}\sin\left(x+\frac{\pi}{4}\right)\)，初始值 \(x=0\) 介于相邻零点 \(-\frac{\pi}{4}\) 与 \(\frac{3\pi}{4}\) 之间。当 \(x\) 趋近边界时，\(t\) 的变化范围为：
+\[
+x \in \left(-\frac{\pi}{4}, \frac{3\pi}{4}\right) \;\Longrightarrow\; t \in \left(1-\sqrt{2},\; 1+\sqrt{2}\right),
+\]
+即解的最大存在区间。
+
+\subsection*{6}
+考虑初值问题
+\[
+\begin{cases}
+x' = \sqrt{|x|}, \\
+x(0) = 0.
+\end{cases}
+\]
+令 \(f(t,x) = \sqrt{|x|}\)，则 \(f\) 在整个 \(\mathbb{R}^2\) 上连续。
+
+利用定理1进行解的延拓： 
+
+对任意给定的 \(T > 0\)，取矩形 \(R = [-T, T] \times [-T^2, T^2]\)，中心为 \((0,0)\)。\(f\) 在 \(R\) 上连续，最大值 \(M = \max_{|x| \le T^2} \sqrt{|x|} = T\)。  
+由定理1，解在 \(|t| \le \min\left(T, \frac{T^2}{T}\right) = T\) 上存在。由于 \(T\) 可任意大，且方程右端函数满足 Osgood 型增长条件，利用延拓定理可将局部解无限延拓至整条实线。事实上，该方程存在例如
+\[
+x(t) = \begin{cases} 
+\frac{1}{4}t^2, & t \ge 0 \\
+0, & t < 0
+\end{cases}
+\]
+等各种定义在全 \(\mathbb{R}\) 上的解。综上，初值问题在整条实线上有解。
+\subsection*{12}
+
+1. 验证 Lipschitz 条件
+
+方程为  
+\[
+x' = f(t,x) = 1 + x + x^2\cos t, \quad x(0)=0.
+\]
+
+取矩形区域  
+\[
+R = \{(t,x) : |t| \le \alpha,\; |x| \le \beta\},
+\]
+选 \(\alpha = \frac13\)，\(\beta = 1\)（与前面定理 1 的选取一致）。
+
+在 \(R\) 上，计算 \(f\) 对 \(x\) 的偏导数：  
+\[
+\frac{\partial f}{\partial x}(t,x) = 1 + 2x\cos t,
+\]
+在其上有界：
+\[
+\left|\frac{\partial f}{\partial x}\right| \le 1 + 2|x| \le 1 + 2\beta = 3.
+\]
+
+由微分中值定理，对任意 \((t,x_1),(t,x_2)\in R\)：
+\[
+|f(t,x_1)-f(t,x_2)| \le \max_{R}\left|\frac{\partial f}{\partial x}\right|\cdot|x_1-x_2| \le 3|x_1-x_2|.
+\]
+因此 \(f\) 在 \(R\) 上关于 \(x\) 满足 Lipschitz 条件，Lipschitz 常数可取 \(L=3\)。
+
+2. 应用 Picard 定理
+
+% Picard 定理的标准形式：  
+% 若 \(f(t,x)\) 在矩形 \(R\) 上连续，且关于 \(x\) 满足 Lipschitz 条件，则初值问题在区间
+% \[
+% |t-t_0| \le \min\!\left(\alpha,\; \frac{\beta}{M}\right)
+% \]
+% 上存在唯一解，其中 \(M = \max_R |f(t,x)|\)。
+
+在 \(R\) 中：
+\[
+|f(t,x)| = |1 + x + x^2\cos t| \le 1 + \beta + \beta^2 = 3 \;\Rightarrow\; M=3.
+\]
+
+于是  
+\[
+\frac{\beta}{M} = \frac13,\quad \min(\alpha, \beta/M) = \min\!\left(\frac13, \frac13\right) = \frac13.
+\]
+
+根据 Picard 定理，该初值问题在 \(|t| \le 1/3\) 即 \([-1/3,\,1/3]\) 上存在唯一的解。
+
+\section*{8.2}
+\subsection*{2}
+验证初值问题 \(x'=\sqrt{x},\; x(0)=0\) 的解是 \(x(t)=t^2/4\)。应用一阶泰勒级数方法并说明为什么数值解与解 \(t^2/4\) 不同。
+
+1. 验证 \(x(t)=t^2/4\) 是解
+
+对 \(t \ge 0\)：
+\[
+x(t) = \frac{t^2}{4} \;\Longrightarrow\; x'(t) = \frac{t}{2}.
+\]
+而
+\[
+\sqrt{x(t)} = \sqrt{\frac{t^2}{4}} = \frac{|t|}{2} = \frac{t}{2} \quad (t \ge 0).
+\]
+所以当 \(t \ge 0\) 时，\(x'(t) = \sqrt{x(t)}\)，且 \(x(0)=0\)。  
+
+2. 用一阶泰勒级数方法求数值解
+
+迭代公式：
+\[
+x_{n+1} = x_n + h\, f(t_n, x_n), \quad f(t,x) = \sqrt{x},
+\]
+取步长 \(h>0\)，初始值 \(t_0=0,\; x_0=0\)。
+
+第一步：
+\[
+x_1 = 0 + h \cdot \sqrt{0} = 0.
+\]
+以此类推，对所有 \(n\) 都有 \(x_n = 0\)。  
+因此欧拉方法产生的数值解恒为 \(x(t) \equiv 0\)。
+
+3. 为什么数值解与 \(t^2/4\) 不同
+
+因为方程 \(x' = \sqrt{x}\) 在 \(x=0\) 附近不满足 Lipschitz 条件（导数 \(\frac{\partial f}{\partial x} = \frac{1}{2\sqrt{x}}\) 在 \(x=0\) 处无界）。  
+初值问题的解不唯一：它既有平凡解 \(x(t) \equiv 0\)，也有非零解 \(x(t) = t^2/4\)（以及无穷多个在零上停留一段时间后再离开的解）。
+
+欧拉方法从 \(x=0\) 出发时，每一步都计算 \(\sqrt{x_n} = 0\)，因此数值解“粘”在零解上，无法自发地进入非零解分支。这是数值方法在奇点（导数不满足 Lipschitz）处无法选出非平凡解的一个典型例子。  
+要得到非零解 \(t^2/4\)，必须用其他手段（例如解析求解或特殊设计的数值格式，或添加微小扰动）来避开这个奇性。
+
+\subsection*{6}
+
+对给定的积分方程
+
+\[
+x(t) = \int_{0}^{t} \cos(s + x(s)) \, ds + e^{t}
+\]
+
+两边关于 \(t\) 求导，利用微积分基本定理，注意积分上限求导时被积函数取 \(s=t\)，得到
+
+\[
+x'(t) = \cos(t + x(t)) + e^{t}.
+\]
+
+代入 \(t=0\) 到原方程确定初始条件：
+
+\[
+x(0) = \int_{0}^{0} \cos(s+x(s))\,ds + e^{0} = 0 + 1 = 1.
+\]
+
+因此，等价的初值问题为
+
+\[
+\begin{cases}
+x'(t) = \cos(t + x(t)) + e^{t}, \\[4pt]
+x(0) = 1.
+\end{cases}
+\]
+\end{document}

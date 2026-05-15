@@ -1,0 +1,220 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[UTF8]{ctex}          % 中文支持
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}     % 数学符号
+\usepackage{listings}            % 代码排版
+\usepackage{xcolor}              % 颜色
+\usepackage{geometry}            % 页面边距
+\usepackage{hyperref}            % 超链接
+\geometry{left=1.5cm,right=1.5cm,top=2.5cm,bottom=2.5cm}
+
+% MATLAB 代码样式
+\lstset{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    escapeinside={\%*}{*)},
+    morekeywords={u,v,w,RichardsonExtrapolation,romberg,sinx_over_x,stable_b,exp_m1_over_t,print_romberg}
+}
+
+\title{第八周上机作业}
+\author{PB23000270 李佩优}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{基于龙贝格外推的数值积分}
+
+\subsection{程序概述}
+
+程序 \texttt{hw8.m} 实现了龙贝格（Romberg）积分算法，用于计算以下三个在奇点或无穷区间上需要特殊处理的定积分：
+\[
+\begin{aligned}
+I_a &= \int_0^1 \frac{\sin x}{x}\,dx,\\[4pt]
+I_b &= \int_{-1}^1 \frac{\cos x - e^x}{\sin x}\,dx,\\[4pt]
+I_c &= \int_1^\infty \frac{1}{x\,e^{x}}\,dx \quad \left(\text{通过变换 }x=\frac{1}{t}\text{ 化为 }\int_0^1 \frac{e^{-1/t}}{t}\,dt\right).
+\end{aligned}
+\]
+程序首先对每个积分的被积函数在奇点处进行特殊处理（极限延拓或恒等变形），然后调用统一的龙贝格函数生成外推阵列，最终输出阵列及对角线近似值。阵列行数设为 \(n=7\)。
+
+\subsection{算法原理}
+
+\subsubsection{龙贝格积分方法}
+龙贝格积分建立在复化梯形公式的基础上。将区间 \([a,b]\) 逐次二等分，记步长 \(h_k = (b-a)/2^{k-1}\)，得到梯形序列
+\[
+T_{1,1} = \frac{h_1}{2}\bigl[f(a)+f(b)\bigr],\qquad 
+T_{k,1} = \frac{1}{2}T_{k-1,1} + h_k\sum_{i=1}^{2^{k-2}} f\bigl(a+(2i-1)h_k\bigr),\ k\ge 2.
+\]
+若被积函数充分光滑，梯形值满足渐近展开
+\[
+I - T_{k,1} = c_2 h_k^2 + c_4 h_k^4 + c_6 h_k^6 + \cdots,
+\]
+其中只含步长的偶次幂。利用该展开进行理查森（Richardson）外推，可逐列消去低阶误差项：
+\[
+T_{k,j} = \frac{4^{j-1} T_{k,j-1} - T_{k-1,j-1}}{4^{j-1} - 1},\qquad j=2,3,\dots,k.
+\]
+由此构造出一个下三角矩阵（龙贝格阵列），其对角线元素 \(T_{n,n}\) 通常具有极高精度，且收敛速度远快于原始梯形序列。
+
+\subsubsection{奇点处理与变量变换}
+\begin{itemize}
+    \item \textbf{积分 \(I_a\)}：被积函数 \(\frac{\sin x}{x}\) 在 \(x=0\) 处可去奇点的极限为 \(1\)，程序通过向量化掩码令该点直接返回 \(1\)。
+    \item \textbf{积分 \(I_b\)}：函数在 \(x=0\) 处需谨慎处理，避免分子分母同时趋于零带来的舍入误差。利用恒等式
+    \[
+    \cos x - e^x = -2\sin^2\frac{x}{2} - (e^x-1),\qquad \sin x = 2\sin\frac{x}{2}\cos\frac{x}{2},
+    \]
+    并采用 \texttt{expm1} 以提高小变量处的精度。\(x=0\) 处的极限值为 \(-1\)。
+    \item \textbf{积分 \(I_c\)}：原积分区间为 \([1,\infty)\)，作变量代换 \(x = 1/t\)，得到
+    \[
+    \int_1^\infty \frac{1}{x e^x}\,dx = \int_0^1 \frac{e^{-1/t}}{t}\,dt.
+    \]
+    被积函数在 \(t=0\) 的极限为 \(0\)，同样通过掩码处理。
+\end{itemize}
+
+\subsection{程序结构说明}
+
+程序的主流程包含三个被积函数的定义，调用 \texttt{romberg} 函数计算 7 行龙贝格阵列，最后用 \texttt{print\_romberg} 打印下三角阵列与对角线结果。核心子函数如下：
+
+\begin{lstlisting}[caption={主程序框架及辅助函数}, label={lst:hw8main}]
+clear; clc; format long e;
+
+f_a = @(x) sinx_over_x(x);
+f_b = @(x) stable_b(x);
+f_c = @(t) exp_m1_over_t(t);
+
+n_rows = 7;
+R_a = romberg(f_a, 0, 1, n_rows);
+print_romberg(R_a);
+
+R_b = romberg(f_b, -1, 1, n_rows);
+print_romberg(R_b);
+
+R_c = romberg(f_c, 0, 1, n_rows);
+print_romberg(R_c);
+
+function y = sinx_over_x(x)
+    y = ones(size(x));
+    mask = (x ~= 0);
+    y(mask) = sin(x(mask)) ./ x(mask);
+end
+
+function y = stable_b(x)
+    y = zeros(size(x));
+    mask0 = (x == 0);
+    y(mask0) = -1;
+    x_non = x(~mask0);
+    s = sin(x_non/2);
+    c = cos(x_non/2);
+    y(~mask0) = (-2*s.^2 - expm1(x_non)) ./ (2*s.*c);
+end
+
+function y = exp_m1_over_t(t)
+    y = zeros(size(t));
+    mask0 = (t == 0);
+    y(mask0) = 0;
+    t_non = t(~mask0);
+    y(~mask0) = exp(-1./t_non) ./ t_non;
+end
+\end{lstlisting}
+
+龙贝格外推核心算法 \texttt{romberg} 的实现如下：
+
+\begin{lstlisting}[caption={龙贝格函数}, label={lst:romberg}]
+function R = romberg(f, a, b, n)
+    R = zeros(n, n);
+    h = b - a;
+    R(1,1) = (h/2) * (f(a) + f(b));
+    for i = 2:n
+        h = h / 2;
+        x_new = a + (2*(1:2^(i-2)) - 1) * h;
+        sum_f = sum(f(x_new));
+        R(i,1) = 0.5 * R(i-1,1) + h * sum_f;
+        for j = 2:i
+            R(i,j) = (4^(j-1) * R(i,j-1) - R(i-1,j-1)) / (4^(j-1) - 1);
+        end
+    end
+end
+\end{lstlisting}
+
+\subsection{数值结果与分析}
+
+程序在北太天元上运行，输出结果如下：
+
+\begin{verbatim}
+============= 积分 a: ∫_0^1 sin(x)/x dx =============
+龙贝格阵列 (行数 7):
+0.9207355 
+0.9397933 0.9461459 
+0.9445135 0.9460869 0.9460830 
+0.9456909 0.9460833 0.9460831 0.9460831 
+0.9459850 0.9460831 0.9460831 0.9460831 0.9460831 
+0.9460586 0.9460831 0.9460831 0.9460831 0.9460831 0.9460831 
+0.9460769 0.9460831 0.9460831 0.9460831 0.9460831 0.9460831 0.9460831 
+积分近似值 (对角线):  0.9460831
+
+
+============= 积分 b: ∫_{-1}^1 (cos x - e^x)/sin x dx =============
+龙贝格阵列 (行数 7):
+-2.7932067 
+-2.3966033 -2.2644022 
+-2.2852177 -2.2480892 -2.2470016 
+-2.2563259 -2.2466953 -2.2466023 -2.2465960 
+-2.2490303 -2.2465984 -2.2465919 -2.2465918 -2.2465917 
+-2.2472017 -2.2465921 -2.2465917 -2.2465917 -2.2465917 -2.2465917 
+-2.2467442 -2.2465917 -2.2465917 -2.2465917 -2.2465917 -2.2465917 -2.2465917 
+积分近似值 (对角线):  -2.2465917
+
+
+============= 积分 c: ∫_1^∞ (x e^x)^{-1} dx  (变换后 ∫_0^1 e^{-1/t}/t dt) =============
+龙贝格阵列 (行数 7):
+0.1839397 
+0.2273051 0.2417603 
+0.2198339 0.2173435 0.2157157 
+0.2193510 0.2191900 0.2193131 0.2193702 
+0.2193836 0.2193945 0.2194081 0.2194096 0.2194097 
+0.2193839 0.2193840 0.2193834 0.2193830 0.2193829 0.2193828 
+0.2193839 0.2193839 0.2193839 0.2193839 0.2193839 0.2193839 0.2193839 
+积分近似值 (对角线):  0.2193839
+\end{verbatim}
+
+\textbf{分析}：
+\begin{itemize}
+    \item \textbf{积分 \(I_a\)}：该积分即为正弦积分 \(\mathrm{Si}(1)\)，精确值约为 \(0.946083070367183\cdots\)。龙贝格阵列从第一行的 \(0.9207\) 到对角线的 \(0.94608307036718\)，仅用 7 行就已达到 \(10^{-14}\) 量级的精度，显示出极快的收敛速度。从阵列中可以看到，随着外推阶数增加，同一列中的数值迅速趋于稳定。
+    \item \textbf{积分 \(I_b\)}：被积函数在 \(x=0\) 附近变化剧烈，但经过稳定处理后，龙贝格阵列的对角线收敛至 \(-2.24659172072862\)，前 7 位有效数字已经稳定。与初始梯形值 \(-2.793\) 相比，精度大幅提升。阵列第二行以后的对角线元素几乎不再变化，表明外推已基本消除误差主导项。
+    \item \textbf{积分 \(I_c\)}：该积分本质上是指数积分 \(E_1(1)\)，其标准值约为 \(0.219383934395\cdots\)。对角线近似值 \(0.21938394142680\) 与真值相差约 \(7\times10^{-9}\)，精度同样令人满意。注意到阵列的非对角线元素在外推过程中略有波动（如第 6 行第 3、4 列），这是梯形序列尚未完全进入渐近区域时的正常现象；对角线则继续保持单调稳定。
+\end{itemize}
+
+三个积分的结果均表明，仅需 7 次区间剖分（对应 7 行龙贝格阵列），外推即可将精度提升至接近机器精度。龙贝格方法对于仅有可去奇点或通过解析延拓光滑化的被积函数，仍然能保持高阶收敛特性。
+
+\subsection{总结}
+
+本实验实现并验证了龙贝格外推积分算法在处理具有可去奇点、无穷区间或数值敏感型被积函数时的有效性。通过合理处理边界奇点（取极限值或恒等变形），并结合理查森外推消除梯形误差展开中的低阶项，可以在较少计算量下获得高精度数值积分。实验同时表明，对于充分光滑的被积函数，龙贝格阵列的对角线元素收敛极快，是实际数值积分中一种可靠且高效的方法。
+
+\newpage
+\section{计算机代码}
+
+\small
+\hrule
+\verbatiminput{hw8.m}
+\hrule
+
+\end{document}

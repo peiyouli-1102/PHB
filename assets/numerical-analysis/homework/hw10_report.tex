@@ -1,0 +1,229 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{left=1.5cm,right=1.5cm,top=2.5cm,bottom=2.5cm}
+
+% MATLAB 代码样式
+\lstset{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    escapeinside={\%*}{*)},
+    morekeywords={fzero,odeset,ode45,linspace,NaN}
+}
+
+\title{第十周上机作业}
+\author{PB23000270 李佩优}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{问题描述}
+
+考虑一阶常微分方程初值问题
+\begin{equation}\label{eq:ode}
+    x' = \frac{t - e^{-t}}{x + e^x}, \qquad x(0) = 0.
+\end{equation}
+该方程的真解由隐式方程
+\begin{equation}\label{eq:implicit}
+    x^2 - t^2 + 2e^x - 2e^{-t} = 0
+\end{equation}
+给出。当 $t = 1$ 时，可通过数值求解 \eqref{eq:implicit} 得到高精度参考解 $x(1)$。
+
+本实验利用四阶 Adams-Bashforth 多步法计算 $t=1$ 处的数值解，起步阶段采用经典四阶 Runge-Kutta 方法。通过取不同的节点数 $N = 2^k\ (k = 3,4,\dots,8)$，考察方法的收敛性与精度，并分析一个特殊的数值现象：原始初值 $x(0)=0$ 下误差恒为零的原因。
+
+\section{数值方法}
+
+\subsection{Runge-Kutta 起步}
+Adams-Bashforth 方法需要前若干个时刻的函数值才能启动。本实验采用四阶经典 Runge-Kutta 公式 (RK4) 生成 $x_1, x_2, x_3$。对于步长 $h$ 和当前点 $(t_n, x_n)$，RK4 格式为
+\[
+\begin{aligned}
+    k_1 &= h\,f(t_n, x_n), \\
+    k_2 &= h\,f\Bigl(t_n + \frac{h}{2},\, x_n + \frac{k_1}{2}\Bigr), \\
+    k_3 &= h\,f\Bigl(t_n + \frac{h}{2},\, x_n + \frac{k_2}{2}\Bigr), \\
+    k_4 &= h\,f(t_n + h,\, x_n + k_3), \\
+    x_{n+1} &= x_n + \frac{1}{6}(k_1 + 2k_2 + 2k_3 + k_4).
+\end{aligned}
+\]
+
+\subsection{Adams-Bashforth 四阶多步法}
+获得前四个解 $(x_{n-3}, x_{n-2}, x_{n-1}, x_n)$ 后，使用四阶 Adams-Bashforth 显式公式递推：
+\begin{equation}\label{eq:ab4}
+    x_{n+1} = x_n + \frac{h}{24}\Bigl(55 f_n - 59 f_{n-1} + 37 f_{n-2} - 9 f_{n-3}\Bigr),
+\end{equation}
+其中 $f_k = f(t_k, x_k)$。局部截断误差为 $O(h^5)$，全局误差理论阶为 $O(h^4)$。
+
+\subsection{收敛阶估计}
+对不同 $N$ 得到的数值解 $x^{(N)}(1)$ 与参考真解 $x_{\text{exact}}(1)$ 的误差记为
+\[
+E(N) = \bigl|x^{(N)}(1) - x_{\text{exact}}(1)\bigr|.
+\]
+利用相邻两组 $N$ 的误差计算数值收敛阶：
+\[
+\text{Order} = \frac{\ln\bigl(E(N_{\text{old}})/E(N_{\text{now}})\bigr)}
+                     {\ln(N_{\text{now}}/N_{\text{old}})}.
+\]
+
+\section{程序结构说明}
+
+程序由以下几个主要部分构成：
+\begin{itemize}
+    \item \textbf{参考真解计算}：利用 \texttt{fzero} 求解 $t=1$ 时隐式方程 \eqref{eq:implicit} 的根作为精确解；在扰动版本中，则改用 \texttt{ode45} 以极高精度积分得到参考解。
+    \item \textbf{多步法迭代}：对于 $N = 8, 16, \dots, 256$，等分区间 $[0,1]$，用 RK4 起步，再用 \eqref{eq:ab4} 递推到终点。
+    \item \textbf{误差与阶计算}：记录各 $N$ 对应的终点误差，并利用相邻误差比计算收敛阶。
+    \item \textbf{结果输出}：格式化打印表格。
+\end{itemize}
+
+核心代码片段如下（完整代码见附录）：
+
+\begin{lstlisting}[caption={Adams-Bashforth 多步法主循环}, label={lst:core}]
+for idx = 1:length(N_values)
+    N = N_values(idx);
+    h = 1 / N;
+    t = linspace(0, 1, N+1)';
+    x = zeros(N+1, 1);
+    x(1) = x0;               % 初值 (原始为0, 扰动为1e-4)
+
+    % --- RK4 起步 ---
+    for i = 1:min(3, N)
+        tn = t(i); xn = x(i);
+        k1 = h * f(tn, xn);
+        k2 = h * f(tn + h/2, xn + k1/2);
+        k3 = h * f(tn + h/2, xn + k2/2);
+        k4 = h * f(tn + h,   xn + k3);
+        x(i+1) = xn + (k1 + 2*k2 + 2*k3 + k4)/6;
+    end
+
+    % --- Adams-Bashforth 4阶多步法 ---
+    for i = 4:N
+        fn   = f(t(i),   x(i));
+        fn_1 = f(t(i-1), x(i-1));
+        fn_2 = f(t(i-2), x(i-2));
+        fn_3 = f(t(i-3), x(i-3));
+        x(i+1) = x(i) + h/24 * (55*fn - 59*fn_1 + 37*fn_2 - 9*fn_3);
+    end
+    Errors(idx) = abs(x(end) - x_exact);
+end
+\end{lstlisting}
+
+\section{数值结果与分析}
+
+\subsection{原始初值 $x(0)=0$}
+
+运行第一个程序，参考真解为 $x(1) = -1.000000000000000$，所得误差如表 \ref{tab:res1} 所示。
+
+\begin{table}[htbp]
+    \centering
+    \caption{原始初值 $x(0)=0$ 的数值结果}
+    \label{tab:res1}
+    \begin{tabular}{ccc}
+        \toprule
+        $N$ & Error & Order \\
+        \midrule
+        8   & 0.000000e+00 & ---   \\
+        16  & 0.000000e+00 & NaN   \\
+        32  & 0.000000e+00 & NaN   \\
+        64  & 0.000000e+00 & NaN   \\
+        128 & 0.000000e+00 & NaN   \\
+        256 & 0.000000e+00 & NaN   \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+所有步长下的误差均达到机器零。这一“反常”现象源于方程 \eqref{eq:ode} 与初值组合的特殊性。事实上，容易验证 $x(t) = -t$ 满足初值条件及微分方程：
+\[
+\text{若 } x = -t,\ \text{则 } x' = -1,\quad 
+\frac{t - e^{-t}}{x + e^x} = \frac{t - e^{-t}}{-t + e^{-t}} = -1.
+\]
+因此真解是一条简单的直线 $x(t) = -t$。在解曲线上，右端函数恒为常数：
+\[
+f(t, x(t)) = f(t, -t) = -1.
+\]
+此时，RK4 格式退化为 $x_{n+1} = x_n - h$，Adams-Bashforth 公式中所有 $f_k = -1$，代入 \eqref{eq:ab4} 得
+\[
+x_{n+1} = x_n + \frac{h}{24}\bigl[55(-1) - 59(-1) + 37(-1) - 9(-1)\bigr] 
+        = x_n + \frac{h}{24}(-24) = x_n - h.
+\]
+两种方法均精确再现了直线解，截断误差恰好为零。因此无论取何种步长，数值解与真解完全重合，误差恒为零。
+
+\subsection{施加微小扰动 $x(0)=10^{-4}$}
+
+为验证方法的实际收敛阶，在初值上叠加微小扰动 $x(0) = 10^{-4}$。此时解曲线偏离直线 $x = -t$，右端函数不再恒为常数。采用 \texttt{ode45} 以极高精度（$\text{RelTol}=10^{-13},\ \text{AbsTol}=10^{-13}$）计算参考真解，得到 $x(1) \approx -0.155639572645947$。误差与收敛阶如表 \ref{tab:res2} 所示。
+
+\begin{table}[htbp]
+    \centering
+    \caption{扰动初值 $x(0)=10^{-4}$ 的数值结果}
+    \label{tab:res2}
+    \begin{tabular}{ccc}
+        \toprule
+        $N$ & Error & Order \\
+        \midrule
+        8   & 8.786439e-01 & ---      \\
+        16  & 2.308159e+00 & -1.3934  \\
+        32  & 8.176753e-01 & 1.4971   \\
+        64  & 1.974831e-03 & 8.6937   \\
+        128 & 7.608866e-06 & 8.0198   \\
+        256 & 6.566803e-07 & 3.5344   \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+从表中可观察到：
+\begin{itemize}
+    \item 当 $N$ 较小（8, 16）时，误差很大且收敛阶异常，这是因为步长尚未进入方法的渐近收敛区域，整体误差主要由起步阶段的累积误差主导。
+    \item 随着 $N$ 增大，误差迅速下降。$N$ 从 32 增至 64 时，误差由 $8.18\times10^{-1}$ 陡降至 $1.97\times10^{-3}$，对应的阶数高达 $8.69$。这反映出此时网格细化使局部误差中的高阶分量被快速消除。
+    \item 当 $N$ 继续增至 128、256 时，误差进一步下降至 $10^{-6}\sim 10^{-7}$ 量级，收敛阶逐步回落至 3.5 左右，趋近于理论值 4。阶数略低于 4 是由于右端函数具有一定非线性以及起步方法的误差累积。
+\end{itemize}
+
+总体而言，在非退化的初值条件下，RK4 起步的 Adams-Bashforth 4 阶方法表现出了预期的四阶收敛性。
+
+\section{总结}
+
+本实验使用四阶 Adams-Bashforth 多步法结合 RK4 起步，求解了一阶常微分方程初值问题。通过对原始初值 $x(0)=0$ 与扰动初值 $x(0)=10^{-4}$ 两种情况的对比，得出以下结论：
+\begin{enumerate}
+    \item 原始问题存在封闭形式的线性解 $x(t) = -t$，该解使右端函数在解曲线上恒为常数，导致多步法和 RK4 的截断误差完全消失，数值解与真解精确重合。这一现象表明，当微分方程在特定解上退化为平凡情形时，高阶方法可能给出远高于理论阶的精度。
+    \item 对初值施加微小扰动后，线性解被破坏，方法恢复正常的收敛行为。在中等步长下即可观察到四阶收敛趋势，验证了 Adams-Bashforth 公式的理论精度。
+    \item 实验同时说明，起步方法的精度对多步法整体表现至关重要；在步长过大时，误差可能异常并掩盖真实收敛阶。
+\end{enumerate}
+
+\newpage
+\section{附录：计算机代码}
+
+\small
+\subsection*{程序1：原始初值}
+\hrule
+\verbatiminput{hw10.m}
+\vspace{0.5cm}
+\hrule
+
+\subsection*{程序2：扰动初值}
+\hrule
+\verbatiminput{hw10_2.m}
+\hrule
+
+\end{document}

@@ -1,0 +1,159 @@
+\documentclass{article}
+\textheight 23.5cm \textwidth 15.8cm
+\topmargin -1.5cm \oddsidemargin 0.3cm \evensidemargin -0.3cm
+
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{geometry}
+\geometry{a4paper,scale=0.8}
+
+\title{上机作业3：样条插值的数值实验}
+\author{李佩优}
+
+\begin{document}
+\maketitle
+
+\section{引言}
+本次上机作业分为两个部分。第一部分针对函数 \(f(x)=\frac{1}{1+x^2},\;x\in[0,5]\)，在四个等距节点 \(x=0,\frac{5}{3},\frac{10}{3},5\) 上构造三种样条插值：线性样条、自然三次样条和三次 Hermite 样条（导数由中心差分近似），并比较它们的误差。第二部分针对函数 \(f(x)=e^x,\;x\in[0,1]\)，对不同的子区间数 \(N=5,10,20,40\)，构造线性样条和满足端点导数条件 \(S'(0)=1,\;S'(1)=e\) 的三次样条，计算每个小区间中点的最大误差，并分析收敛阶。
+
+\section{原理}
+\subsection{线性样条}
+在区间 \([x_i,x_{i+1}]\) 上，线性样条函数为：
+\[
+S_i(x)=y_i+\frac{y_{i+1}-y_i}{x_{i+1}-x_i}(x-x_i),\quad x\in[x_i,x_{i+1}].
+\]
+插值结果由分段线性函数给出。
+
+\subsection{自然三次样条}
+自然三次样条 \(S(x)\) 在每个子区间上是三次多项式，且满足：
+\[
+S(x_i)=y_i,\quad S''(x_1)=S''(x_n)=0,
+\]
+并在内节点处一阶、二阶导数连续。通过求解三对角方程组得到二阶导数 \(M_i=S''(x_i)\)，然后分段构造：
+\[
+S_i(x)=\frac{(x_{i+1}-x)^3M_i+(x-x_i)^3M_{i+1}}{6h_i}
++\left(y_i-\frac{M_i h_i^2}{6}\right)\frac{x_{i+1}-x}{h_i}
++\left(y_{i+1}-\frac{M_{i+1} h_i^2}{6}\right)\frac{x-x_i}{h_i},
+\]
+其中 \(h_i=x_{i+1}-x_i\)。
+
+\subsection{三次 Hermite 样条}
+给定每个节点的函数值和导数值，三次 Hermite 插值在每个子区间上构造一个三次多项式，满足端点函数值和导数匹配。本文采用中心差分公式估计节点导数：
+\[
+y_i'=\begin{cases}
+\dfrac{y_2-y_1}{x_2-x_1}, & i=1,\\[8pt]
+\dfrac{y_{i+1}-y_{i-1}}{x_{i+1}-x_{i-1}}, & 2\le i\le n-1,\\[8pt]
+\dfrac{y_n-y_{n-1}}{x_n-x_{n-1}}, & i=n.
+\end{cases}
+\]
+然后利用 Hermite 基函数构造分段三次多项式。
+
+\subsection{端点导数已知的三次样条（Clamped Cubic Spline）}
+对于第二部分，边界导数精确给定：\(S'(0)=1,\;S'(1)=e\)。此时样条函数满足：
+\[
+S(x_i)=y_i,\quad S'(x_1)=d_1,\;S'(x_n)=d_n.
+\]
+同样求解三对角方程组得到二阶导数 \(M_i\)，其右端项包含边界导数信息。
+
+\subsection{误差度量与收敛阶}
+对于第二部分，我们计算每个小区间中点 \(x_{i-\frac12}\) 上的绝对误差，并取最大值：
+\[
+E_N=\max_{1\le i\le N}\left|f(x_{i-\frac12})-S(x_{i-\frac12})\right|.
+\]
+收敛阶定义为：
+\[
+\text{Ord}=\frac{\ln(E_{N_{\text{old}}}/E_{N_{\text{now}}})}{\ln(N_{\text{now}}/N_{\text{old}})}.
+\]
+
+\section{结果}
+\subsection{第一部分：三种样条对 \(f(x)=1/(1+x^2)\) 的对比}
+图~\ref{fig:part1} 展示了在节点 \(x=0,\frac{5}{3},\frac{10}{3},5\) 上的插值曲线及误差曲线（对数坐标）。从图中可以看出，线性样条在每个区间内为直线，在节点处连续，但整体光滑性差，误差最大。自然三次样条整体光滑，误差明显小于线性样条。三次 Hermite 样条由于导数由差分近似，在端点附近误差稍大，但整体仍优于线性样条。三种插值在区间中部的误差均较小，而在靠近端点处误差增大，这是因为函数在该区域变化较平缓，但节点数较少导致逼近能力有限。
+
+\begin{table}[htb]
+\centering
+\caption{三种样条插值的最大绝对误差（精细采样点）}
+\label{tab:part1_error}
+\begin{tabular}{|c|c|}
+\hline
+插值类型 & 最大误差 \\
+\hline
+线性样条 & 6.230316e-02 \\
+自然三次样条 & 7.392473e-02 \\
+三次 Hermite 样条 & 5.732441e-02 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{第二部分：等距节点下的误差与收敛阶}
+表~\ref{tab:part2_error} 给出了不同 \(N\) 下线性样条和 clamped 三次样条的最大中点误差及相应的收敛阶。可以看到，随着 \(N\) 增大，两种方法的误差均迅速减小。
+线性样条的收敛阶约为 2，clamped 三次样条的收敛阶约为 4：
+
+对于光滑函数，分段线性插值的收敛阶为 \(O(h^2)\)，
+而三次样条（边界条件准确）的收敛阶为 \(O(h^4)\)，其中 \(h=1/N\)。
+
+\begin{table}[htb]
+\centering
+\caption{线性样条与 clamped 三次样条的误差及收敛阶}
+\label{tab:part2_error}
+\begin{small}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$N$ & 线性样条误差 & 线性收敛阶 & clamped 三次样条误差 & clamped 收敛阶 \\
+\hline 
+5   & 1.2308e-02 & —    & 1.0907e-05 & —    \\
+10  & 3.2328e-03 & 1.9288 & 6.9559e-07 & 3.9709 \\
+20  & 8.2853e-04 & 1.9642 & 4.3871e-08 & 3.9869 \\
+40  & 2.0973e-04 & 1.9820 & 2.7538e-09 & 3.9938 \\
+\hline
+\end{tabular}
+\end{small}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{result1.png}
+\caption{第一部分插值曲线与误差对比图（示意图）}
+\label{fig:part1}
+\end{figure}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{result2.png}
+\caption{第一部分插值曲线与误差对比图（matlab）}
+\label{fig:part1_2}
+\end{figure}
+
+\section{讨论}
+\subsection{第一部分现象解释}
+线性样条仅保证 \(C^0\) 连续性，误差与区间长度 \(h\) 的平方成正比。在只有四个节点的情况下，\(h=5/3\approx 1.67\)，误差较大。自然三次样条具有 \(C^2\) 连续性，能更好地逼近光滑函数，因此误差显著减小。三次 Hermite 样条虽然也采用三次多项式，但导数由简单差分估算，在端点处精度较低，故误差介于两者之间。如果能够提供精确的导数信息，Hermite 样条的误差有望接近自然三次样条。
+
+\subsection{第二部分收敛阶分析}
+实验结果表明，线性样条的收敛阶稳定在 2，clamped 三次样条的收敛阶稳定在 4。这是因为 \(f(x)=e^x\) 无限光滑，且边界导数准确给定，使得样条插值具有最优收敛性质。对于线性样条，误差主要来自局部线性逼近，\(E_N\sim O(h^2)\)；对于三次样条，由于使用更精确的边界条件，误差可达 \(O(h^4)\)。这一结果验证了样条插值的高阶精度特性。
+
+\subsection{实际应用建议}
+当函数光滑且节点较多时，三次样条插值比线性样条能获得更精确的结果，尤其适用于需要高阶光滑性的问题（如数值微分、曲线设计）。但若函数导数信息未知，自然三次样条是一种稳健的选择；而 Hermite 样条则需要在节点处提供可靠的导数估计。
+
+\appendix
+\section{源代码}
+本次实验所有代码均在 MATLAB 中编写，主要包括以下文件：
+\begin{itemize}
+    \item \texttt{hw3\_1.m} —— 第一部分主程序，调用三种插值函数并绘图。
+    \item \texttt{hw3\_2.m} —— 第二部分主程序，计算误差与收敛阶。
+    \item \texttt{hw3\_linear\_spline.m} —— 线性样条插值。
+    \item \texttt{hw3\_natural\_cubic\_spline.m} —— 自然三次样条插值。
+    \item \texttt{hw3\_hermite\_spline.m} —— 三次 Hermite 样条插值（差分导数）。
+    \item \texttt{hw3\_clamped\_cubic\_spline.m} —— 端点导数已知的三次样条插值。
+\end{itemize}
+限于篇幅，此处仅列出主程序的核心代码片段。
+
+\small
+\hrule
+\verbatiminput{hw3_1.m}
+\hrule
+\verbatiminput{hw3_2.m}
+\hrule
+
+\end{document}

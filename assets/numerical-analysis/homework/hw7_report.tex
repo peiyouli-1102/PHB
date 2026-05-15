@@ -1,0 +1,319 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[UTF8]{ctex}          % 中文支持
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}     % 数学符号
+\usepackage{listings}            % 代码排版
+\usepackage{xcolor}              % 颜色
+\usepackage{geometry}            % 页面边距
+\usepackage{hyperref}            % 超链接
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+% MATLAB 代码样式
+\lstset{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    frame=single,
+    tabsize=4,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=false,
+    escapeinside={\%*}{*)},
+    morekeywords={u,v,w,RichardsonExtrapolation,interp_int_approx,polyint,polyval,conv}
+}
+
+\title{第七周上机作业}
+\author{PB23000270 李佩优}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{基于插值型求积的数值积分与 Runge 现象}
+
+\subsection{程序概述}
+
+程序 \texttt{hw7\_1.m} 分别采用等距节点和 Chebyshev 节点构造被积函数的 Lagrange 插值多项式，并通过对插值多项式进行精确积分来近似定积分
+\[
+I = \int_{-1}^{1} \frac{1}{1+25x^2}\,dx = \frac{2}{5}\arctan 5 \approx 0.5493603.
+\]
+取节点数为 \(n+1\)，对应 \(n=5,10,15,20,25,30,35,40\)。通过比较两种节点分布下积分近似值的精度，观察 Runge 现象对数值积分的影响。
+
+\subsection{算法原理}
+
+\subsubsection{插值型求积公式}
+设区间 \([-1,1]\) 上给定 \(n+1\) 个互异节点 \(\{x_i\}_{i=0}^{n}\) 及对应的函数值 \(f(x_i)\)。构造 Lagrange 插值多项式
+\[
+p_n(x) = \sum_{i=0}^{n} f(x_i) \ell_i(x), \qquad \ell_i(x) = \prod_{\substack{j=0\\j\neq i}}^{n} \frac{x-x_j}{x_i-x_j},
+\]
+则积分的近似值为
+\[
+I_n = \int_{-1}^{1} p_n(x)\,dx = \sum_{i=0}^{n} f(x_i) \int_{-1}^{1} \ell_i(x)\,dx.
+\]
+其误差可以表示为
+\[
+I - I_n = \int_{-1}^{1} \frac{f^{(n+1)}(\xi(x))}{(n+1)!} \prod_{j=0}^{n}(x-x_j)\,dx.
+\]
+
+\subsubsection{节点选取与 Runge 现象}
+\begin{itemize}
+    \item \textbf{等距节点}：\(x_i = 1 - \frac{2i}{n},\; i=0,1,\dots,n\)。对于 Runge 函数 \(f(x)=1/(1+25x^2)\)，当 \(n\) 增大时，插值多项式在区间两端出现剧烈振荡，无法一致收敛于 \(f(x)\)，导致积分近似值迅速发散。
+    \item \textbf{Chebyshev 节点}：\(x_i = -\cos\frac{i\pi}{n+2},\; i=1,2,\dots,n+1\)（程序中索引 \(i\) 从 1 至 \(n+1\)）。这些节点在区间端点附近更为密集，能够有效抑制 Runge 现象，使插值多项式随 \(n\) 增大一致收敛于被积函数。
+\end{itemize}
+
+\subsubsection{算法步骤}
+\begin{enumerate}
+    \item 设置数组 \texttt{N\_vals}，对每个 \(n\) 调用子函数 \texttt{interp\_int\_approx(n)}。
+    \item 子函数的执行流程如下：
+    \begin{enumerate}
+        \item 生成等距节点 \texttt{xnodes1} 与 Chebyshev 节点 \texttt{xnodes2}，并计算相应的函数值 \texttt{ynodes1}、\texttt{ynodes2}。
+        \item 对每种节点，利用 \texttt{conv} 逐项构造 Lagrange 基多项式 \(\ell_i(x)\) 的系数（预先除以分母 \texttt{den}），乘以 \(f(x_i)\) 后累加得到插值多项式系数 \texttt{p1\_coeff}、\texttt{p2\_coeff}。
+        \item 通过 \texttt{polyint} 计算多项式的原函数，再分别代入上限 \(1\) 与下限 \(-1\)，得到积分近似值 \(I_1\)、\(I_2\)。
+        \item 计算绝对误差 \texttt{err1}、\texttt{err2}，并与精确值比较。
+    \end{enumerate}
+    \item 输出与当前 \(N=n\) 对应的 \(I_1\)、\(I_2\) 及其误差。
+\end{enumerate}
+
+\subsection{程序结构说明}
+
+\begin{lstlisting}[caption={hw7\_1.m 程序结构}, label={lst:hw7code}]
+clear; close all;
+
+N_vals = [5,10,15,20,25,30,35,40];
+fprintf("Exact : %e \n", 2/5 * atan(5));
+for n = N_vals
+    interp_int_approx(n);
+end
+
+function err = interp_int_approx(n)
+    f = @(x) 1./(1 + 25*x.^2);
+    I_exact = 2/5 * atan(5);
+
+    % 生成节点
+    xnodes1 = zeros(1, n+1); ynodes1 = zeros(1, n+1);
+    xnodes2 = zeros(1, n+1); ynodes2 = zeros(1, n+1);
+    for i = 1:n+1
+        xnodes1(i) = 1 - 2*(i-1)/n;
+        ynodes1(i) = f(xnodes1(i));
+        xnodes2(i) = -cos( i / (n+2) * pi );
+        ynodes2(i) = f(xnodes2(i));
+    end
+
+    % 构造 Lagrange 插值多项式并积分
+    ...
+    I1 = polyval(polyint(p1_coeff), 1) - polyval(polyint(p1_coeff), -1);
+    I2 = polyval(polyint(p2_coeff), 1) - polyval(polyint(p2_coeff), -1);
+    ...
+end
+\end{lstlisting}
+
+\subsection{数值结果与分析}
+
+程序在北太天元上运行，得到的输出结果如下：
+\begin{verbatim}
+Exact : 5.493603e-01 
+N = 5 ; I1 = 4.615e-01 ; I2 = 4.811e-01 ; err1 = 8.782e-02 ; err2 = 6.822e-02
+N = 10 ; I1 = 9.347e-01 ; I2 = 5.541e-01 ; err1 = 3.853e-01 ; err2 = 4.725e-03
+N = 15 ; I1 = 8.311e-01 ; I2 = 5.476e-01 ; err1 = 2.818e-01 ; err2 = 1.774e-03
+N = 20 ; I1 = -5.370e+00 ; I2 = 5.500e-01 ; err1 = 5.919e+00 ; err2 = 6.505e-04
+N = 25 ; I1 = -5.400e+00 ; I2 = 5.494e-01 ; err1 = 5.949e+00 ; err2 = 1.202e-06
+N = 30 ; I1 = 1.538e+02 ; I2 = 5.490e-01 ; err1 = 1.533e+02 ; err2 = 3.209e-04
+N = 35 ; I1 = 1.453e+02 ; I2 = 5.948e-01 ; err1 = 1.448e+02 ; err2 = 4.543e-02
+N = 40 ; I1 = 2.367e+02 ; I2 = 7.968e+00 ; err1 = 2.361e+02 ; err2 = 7.419e+00
+\end{verbatim}
+
+相应的数值结果汇总于附录表~\ref{tab:interp_int}。
+
+\textbf{结果分析}：
+\begin{itemize}
+    \item \textbf{等距节点（\(I_1\)）}：当 \(n\) 较小（\(n=5\)）时，误差约为 \(8.8\times10^{-2}\)；随着 \(n\) 增大，积分近似值迅速恶化。\(n=20\) 时近似值已变为负数，\(n=30\) 以后量级达到 \(10^2\)。这正是 Runge 现象的典型表现：高阶等距插值多项式在区间端点附近剧烈振荡，导致积分结果完全失真。
+    \item \textbf{Chebyshev 节点（\(I_2\)）}：误差随 \(n\) 增大先显著降低，在 \(n=25\) 时达到 \(1.2\times10^{-6}\) 的高精度；但当 \(n=35\)、\(40\) 时，误差有所回升（\(4.5\times10^{-2}\) 和 \(7.4\)）。误差回升的原因并非插值多项式不收敛，而是程序中使用 \texttt{conv} 显式生成多项式系数时，高次多项式的系数极大，有限精度下的舍入误差污染了积分结果。若改用重心 Lagrange 插值或 Clenshaw--Curtis 求积等更稳定的数值方法，可继续保持高精度。
+\end{itemize}
+
+\subsection{总结}
+
+本实验验证了节点选取对插值型求积公式的决定性影响：等距节点受 Runge 现象制约，阶数越高误差反而越大；Chebyshev 节点则能有效克服 Runge 现象，使积分近似值快速收敛到真值。与此同时，实验也揭示了直接使用幂形式多项式系数在高阶情况下存在数值不稳定的隐患，提示在实际计算中宜优先采用更稳定的数值算法。
+
+\section{基于复化梯形与 Gauss-Legendre 求积的数值积分}
+
+\subsection{程序概述}
+
+程序 \texttt{hw7\_2.m} 采用复化梯形公式和复化 3 点 Gauss‑Legendre 公式，对以下三个定积分进行数值计算：
+\[
+I_1 = \int_0^1 e^{-x^2}\,dx,\qquad
+I_2 = \int_0^4 \frac{1}{1+x^2}\,dx,\qquad
+I_3 = \int_0^{2\pi} \frac{1}{2+\cos x}\,dx.
+\]
+它们的精确值分别为
+\[
+I_1=\frac{\sqrt{\pi}}{2}\operatorname{erf}(1)\approx0.746824132812427,\;
+I_2=\arctan 4\approx1.32581766366803,\;
+I_3=\frac{2\pi}{\sqrt{3}}\approx3.62759872846844.
+\]
+取子区间数 \(N=2^k,\;k=1,2,\dots,7\)。通过比较两种方法的实际误差和数值收敛阶，分析其与理论收敛速率的吻合程度。
+
+\subsection{算法原理}
+
+\subsubsection{复化梯形公式}
+将区间 \([a,b]\) 等分为 \(N\) 个子区间，步长记为 \(h=(b-a)/N\)，则复化梯形公式为
+\[
+T_N = \frac{h}{2}\Bigl[f(x_0)+2\sum_{i=1}^{N-1}f(x_i)+f(x_N)\Bigr].
+\]
+若被积函数在 \([a,b]\) 上具有二阶连续导数，其误差满足
+\[
+I-T_N = -\frac{(b-a)h^2}{12}f''(\xi),\quad \xi\in[a,b],
+\]
+因此理论收敛阶为 \(O(h^2)\)。当 \(N\) 加倍时，误差理论上缩小为原来的 \(1/4\)。
+
+\subsubsection{3 点 Gauss‑Legendre 公式}
+在标准区间 \([-1,1]\) 上，3 点 Gauss 节点和权重分别为
+\[
+x_g = \Bigl\{-\sqrt{\frac{3}{5}},\,0,\,\sqrt{\frac{3}{5}}\Bigr\},\qquad
+w_g = \Bigl\{\frac{5}{9},\,\frac{8}{9},\,\frac{5}{9}\Bigr\}.
+\]
+该公式对次数不超过 \(5\) 的多项式精确成立，局部误差为 \(O(h^5)\)。
+复化后，将 \([a,b]\) 等分为 \(N\) 个子区间，在每个子区间上作变量代换并应用 3 点 Gauss 公式，整体误差仍为 \(O(h^5)\)，即理论收敛阶约为 5。对于充分光滑的函数，实际中该公式往往表现出更高的收敛阶（超收敛现象），因为误差展开式的低次项系数可能为零。
+
+\subsubsection{数值收敛阶估计}
+设连续两次细分的子区间数分别为 \(N_{\text{old}}\) 和 \(N_{\text{new}}\)，相应的误差为 \(E_{\text{old}}\) 和 \(E_{\text{new}}\)，则收敛阶可由下式估计
+\[
+p \approx \frac{\log(E_{\text{old}}/E_{\text{new}})}{\log(N_{\text{new}}/N_{\text{old}})}.
+\]
+本实验中 \(N\) 每次翻倍，分母为 \(\ln 2\)，故实际计算时采用 \(p = \log_2(E_{\text{old}}/E_{\text{new}})\)。
+
+\subsection{程序结构说明}
+
+\begin{lstlisting}[caption={hw7\_2.m 程序结构}, label={lst:hw7code}]
+clear; clc; format long;
+
+% 被积函数、精确值、区间
+f1 = @(x) exp(-x.^2);
+f2 = @(x) 1./(1 + x.^2);
+f3 = @(x) 1./(2 + cos(x));
+...
+
+% 主循环
+for idx = 1:nN
+    N = N_vals(idx);
+    for s = 1:3
+        % 计算复化梯形、复化 3 点 Gauss
+        ...
+    end
+end
+
+% 计算收敛阶并打印表格
+...
+\end{lstlisting}
+
+程序中的核心子函数：
+\begin{itemize}
+    \item \texttt{composite\_trapezoidal(f,a,b,N)}：实现复化梯形积分。
+    \item \texttt{composite\_gauss3(f,a,b,N)}：实现复化 3 点 Gauss 积分，利用矩阵运算一次性计算所有子区间。
+    \item \texttt{print\_table}：格式化输出误差表及相应的收敛阶估计。
+\end{itemize}
+
+\subsection{数值结果与分析}
+
+程序在北太天元上运行，输出结果整理为表~\ref{tab:trap} 和表~\ref{tab:gauss}。
+
+\subsubsection{积分 \(I_1=\int_0^1 e^{-x^2}dx\)}
+梯形公式呈现典型的二阶收敛特性，收敛阶稳定在 \(2.00\) 左右。Gauss 公式的收敛阶约为 \(6.0\)，明显高于理论值 5，说明被积函数 \(e^{-x^2}\) 在 \([0,1]\) 上的 Taylor 展开使得低次误差项系数极小，从而表现出超收敛现象。当 \(N\ge 64\) 时，Gauss 积分的误差已降至机器精度以下。
+
+\subsubsection{积分 \(I_2=\int_0^4 \frac{1}{1+x^2}dx\)}
+梯形公式的收敛阶初期略有波动（这源于函数在 \(x\) 较大处变化平缓），随后稳定于 \(2.0\)。Gauss 公式的收敛行为较为特殊：在 \(N=2,4\) 时误差几乎不变（收敛阶接近 0），\(N=8\) 后误差迅速降至机器精度，阶估计出现很大数值。这是因为该函数在复平面存在奇点，当节点数不足时误差尚未进入渐近收敛区域；一旦节点数足够，精度便急剧提升。
+
+\subsubsection{积分 \(I_3=\int_0^{2\pi} \frac{1}{2+\cos x}dx\)}
+被积函数是以 \(2\pi\) 为周期的解析函数，在实轴上无奇点。对于周期解析函数，梯形公式具有**指数收敛**特性。从表~\ref{tab:trap} 可以看出，误差随 \(N\) 增大而急剧下降，收敛阶估计值远大于 2（达到 \(10^1\sim10^2\) 量级）。Gauss 公式虽然同样快速收敛，但速度不及梯形公式，收敛阶约为 \(5\sim6\)，最终也受机器精度限制。
+
+\subsection{总结}
+
+本实验验证了复化梯形公式的二阶收敛性以及复化 Gauss 公式的高阶收敛特性。尤其值得关注的是，对周期解析函数 \(I_3\)，梯形公式展现出远优于 Gauss 方法的指数收敛，这是数值积分中一个重要且实用的性质。当误差逐渐逼近机器精度时，舍入误差将成为主导因素，进一步细分子区间不再提升精度。
+
+\newpage
+\appendix
+\section{数值结果表}
+
+\begin{table}[htbp]
+\centering
+\caption{不同节点数下的积分近似值与绝对误差}
+\label{tab:interp_int}
+\begin{tabular}{c c c c c c}
+\toprule
+\(N\) & \(I_1\)（等距） & 误差 \(\mathrm{err}_1\) & \(I_2\)（Chebyshev） & 误差 \(\mathrm{err}_2\) \\
+\midrule
+5  & \(4.615\times10^{-1}\) & \(8.782\times10^{-2}\) & \(4.811\times10^{-1}\) & \(6.822\times10^{-2}\) \\
+10 & \(9.347\times10^{-1}\) & \(3.853\times10^{-1}\) & \(5.541\times10^{-1}\) & \(4.725\times10^{-3}\) \\
+15 & \(8.311\times10^{-1}\) & \(2.818\times10^{-1}\) & \(5.476\times10^{-1}\) & \(1.774\times10^{-3}\) \\
+20 & \(-5.370\times10^{0}\)  & \(5.919\times10^{0}\)  & \(5.500\times10^{-1}\) & \(6.505\times10^{-4}\) \\
+25 & \(-5.400\times10^{0}\)  & \(5.949\times10^{0}\)  & \(5.494\times10^{-1}\) & \(1.202\times10^{-6}\) \\
+30 & \(1.538\times10^{2}\)   & \(1.533\times10^{2}\)   & \(5.490\times10^{-1}\) & \(3.209\times10^{-4}\) \\
+35 & \(1.453\times10^{2}\)   & \(1.448\times10^{2}\)   & \(5.948\times10^{-1}\) & \(4.543\times10^{-2}\) \\
+40 & \(2.367\times10^{2}\)   & \(2.361\times10^{2}\)   & \(7.968\times10^{0}\)  & \(7.419\times10^{0}\) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+精确值：\(I = \frac{2}{5}\arctan(5) \approx 5.493603\times10^{-1}\)。
+
+\begin{table}[htbp]
+\centering
+\caption{复化梯形公式误差与收敛阶}
+\label{tab:trap}
+\begin{tabular}{c c c c c c c}
+\toprule
+\(N\) & \(I_1\) 误差 & 阶 & \(I_2\) 误差 & 阶 & \(I_3\) 误差 & 阶 \\
+\midrule
+2   & 1.5454e-02 & -- & 1.3301e-01 & -- & 5.6119e-01 & -- \\
+4   & 3.8400e-03 & 2.009 & 3.5941e-03 & 5.210 & 3.7593e-02 & 3.900 \\
+8   & 9.5852e-04 & 2.002 & 5.6426e-04 & 2.671 & 1.9279e-04 & 7.607 \\
+16  & 2.3954e-04 & 2.001 & 1.4408e-04 & 1.969 & 5.1226e-09 & 15.200 \\
+32  & 5.9878e-05 & 2.000 & 3.6038e-05 & 1.999 & 4.4409e-16 & 23.460 \\
+64  & 1.4969e-05 & 2.000 & 9.0106e-06 & 2.000 & 4.4409e-16 & 0.000 \\
+128 & 3.7423e-06 & 2.000 & 2.2527e-06 & 2.000 & 4.4409e-16 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{复化 3 点 Gauss 公式误差与收敛阶}
+\label{tab:gauss}
+\begin{tabular}{c c c c c c c}
+\toprule
+\(N\) & \(I_1\) 误差 & 阶 & \(I_2\) 误差 & 阶 & \(I_3\) 误差 & 阶 \\
+\midrule
+2   & 3.6111e-08 & -- & 1.2676e-04 & -- & 6.1166e-03 & -- \\
+4   & 4.0215e-10 & 6.489 & 1.2593e-04 & 0.009 & 7.3833e-04 & 3.050 \\
+8   & 5.7422e-12 & 6.130 & 2.4580e-07 & 9.001 & 4.3261e-06 & 7.415 \\
+16  & 8.7708e-14 & 6.033 & 2.0706e-12 & 16.857 & 1.1502e-10 & 15.199 \\
+32  & 1.4433e-15 & 5.925 & 4.5297e-14 & 5.514 & 4.4409e-16 & 17.983 \\
+64  & 0.0000e+00 & Inf   & 6.6613e-16 & 6.087 & 4.4409e-16 & 0.000 \\
+128 & 0.0000e+00 & NaN   & 2.2204e-16 & 1.585 & 4.4409e-16 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+\section{计算机代码}
+
+\small
+\hrule
+\verbatiminput{hw7_1.m}
+\verbatiminput{hw7_2.m}
+\hrule
+
+\end{document}

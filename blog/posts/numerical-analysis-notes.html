@@ -25,23 +25,90 @@
         </header>
 
         <section aria-labelledby="outline-heading">
-          <h2 id="outline-heading">1. 课程脉络（概要）</h2>
+          <h2 id="outline-heading">课程脉络（概要）</h2>
           <p>
-            数值分析关心如何用离散、有限的计算近似连续数学问题，并在计算机浮点环境下理解<strong>误差来源</strong>（模型误差、截断误差、舍入误差）与<strong>稳定性</strong>。常见主线包括：非线性方程与线性方程组的迭代解法；插值与拟合；数值微分与数值积分；常微分方程初值问题的单步与多步法；以及矩阵特征值问题的基础思路等。
-          </p>
-          <p>
-            以下为占位叙述：你可按授课顺序把各章定义、定理与算法步骤替换为正式笔记条目。
+            数值分析关心如何用离散、有限的计算近似连续数学问题，并在计算机浮点环境下理解<strong>误差来源</strong>（模型误差、截断误差、舍入误差）与<strong>稳定性</strong>。
+            主要分为三个章节：函数逼近/插值，数值微分/数值积分，常微分方程数值解，偏微分方程数值解
           </p>
         </section>
 
-        <section aria-labelledby="understanding-heading">
-          <h2 id="understanding-heading">2. 个人理解（占位）</h2>
-          <p>
-            理解数值方法的关键，往往在于把「误差如何积累」「迭代何时收敛」「步长如何权衡精度与代价」三件事说清楚。例如：同样是解线性方程组，直接法与迭代法适用的矩阵结构不同；同样是积分，复合公式通过细分区间降低截断误差，但步长过小会放大舍入误差。
-          </p>
-          <p>
-            此处可替换为你的课堂例题推导、易错点对比、以及与编程实验（MATLAB 等）对照的心得。
-          </p>
+        <section aria-labelledby="approximation-heading">
+          <h2 id="approximation-heading">函数逼近</h2>
+          <h3>多项式插值</h3>
+          <p></p>
+          <h3>均差</h3>
+          <p></p>
+          <h3>埃米尔特插值</h3>
+          <p></p>
+          <h3>样条插值</h3>
+          <p></p>
+          <h3>B样条</h3>
+          <p></p>
+          <h3>泰勒技术</h3>
+          <p></p>
+          <h3>最佳逼近：最小二乘理论</h3>
+          <p></p>
+          <h3>最佳逼近：切比雪夫理论</h3>
+          <p></p>
+          <h3>高维插值（三角剖分）</h3>
+          <p></p>
+          <h3>连分式</h3>
+          <p></p>
+          <h3>三角插值</h3>
+          <p></p>
+          <h3>快速傅里叶变换（FTT）</h3>
+          <p></p>
+          <h3>自适应逼近</h3>
+          <p></p>
+        </section>
+
+        <section aria-labelledby="differentiation-integration-heading">
+          <h2 id="differentiation-integration-heading">数值微分/数值积分</h2>
+          <h3>数值微分和理查森外推</h3>
+          <p></p>
+          <h3>基于插值的数值微分</h3>
+          <p></p>
+          <h3>高斯求积</h3>
+          <p></p>
+          <h3>龙贝格积分</h3>
+          <p></p>
+          <h3>自适应求积</h3>
+          <p></p>
+          <h3>逼近泛函的Sard定理</h3>
+          <p></p>
+        </section>
+
+        <section aria-labelledby="ode-heading">
+          <h2 id="ode-heading">常微分方程数值解</h2>
+          <h3>解的存在性和唯一性</h3>
+          <p></p>
+          <h3>泰勒级数方法</h3>
+          <p></p>
+          <h3>龙格-库塔方法</h3>
+          <p></p>
+          <h3>多步法</h3>
+          <p></p>
+          <h3>局部误差和整体误差：稳定性</h3>
+          <p></p>
+          <h3>方程组和告诫常微分方程</h3>
+          <p></p>
+          <h3>边值问题</h3>
+          <p></p>
+          <h3>边值问题：打靶法</h3>
+          <p></p>
+          <h3>边值问题：有限差分法</h3>
+          <p></p>
+          <h3>边值问题：配置法</h3>
+          <p></p>
+          <h3>线性微分方程</h3>
+          <p></p>
+          <h3>刚性方程</h3>
+          <p></p>
+        </section>
+
+        <section aria-labelledby="pde-heading">
+          <h2 id="pde-heading">偏微分方程数值解</h2>
+          <p> 敬请期待（） </p>
         </section>
 
         <section aria-labelledby="course-files-heading">
@@ -50,9 +117,6 @@
             下列文件放在仓库 <code>assets/numerical-analysis/course/</code>。格式可能包括 <code>.m</code>、<code>.tex</code>、<code>.pdf</code> 等；列表随仓库更新增删，<strong>不固定数量</strong>。当前为占位文件，可整体替换。
           </p>
           <ul class="file-list">
-            <li><a href="../../assets/numerical-analysis/course/placeholder-course.m" download>placeholder-course.m</a></li>
-            <li><a href="../../assets/numerical-analysis/course/placeholder-course.tex" download>placeholder-course.tex</a></li>
-            <li><a href="../../assets/numerical-analysis/course/placeholder-course.pdf" download>placeholder-course.pdf</a></li>
             <li><a href="../../assets/numerical-analysis/course/数值分析-第三版-华章-David.Kincaid.pdf" download>数值分析教材.pdf</a></li>
           </ul>
         </section>
@@ -60,12 +124,134 @@
         <section aria-labelledby="homework-files-heading">
           <h2 id="homework-files-heading">4. 作业整理附件</h2>
           <p class="note">
-            下列文件放在仓库 <code>assets/numerical-analysis/homework/</code>。格式可能包括 <code>.m</code>、<code>.tex</code>、<code>.pdf</code> 等；列表随仓库更新增删，<strong>不固定数量</strong>。
+            下列文件位于 <code>assets/numerical-analysis/homework/</code>。<code>hw*.tex</code> 为书面作业；其余按实验编号分组（代码、报告源文件与 PDF）。
           </p>
+          <h3>书面作业</h3>
           <ul class="file-list">
-            <li><a href="../../assets/numerical-analysis/homework/placeholder-homework.m" download>placeholder-homework.m</a></li>
-            <li><a href="../../assets/numerical-analysis/homework/placeholder-homework.tex" download>placeholder-homework.tex</a></li>
-            <li><a href="../../assets/numerical-analysis/homework/placeholder-homework.pdf" download>placeholder-homework.pdf</a></li>
+            <li>
+              <a href="../../assets/numerical-analysis/homework/hw1.tex" download>hw1.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw2.tex" download>hw2.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw3.tex" download>hw3.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw4.tex" download>hw4.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw5.tex" download>hw5.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw6.tex" download>hw6.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw7.tex" download>hw7.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw8.tex" download>hw8.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw9.tex" download>hw9.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw10.tex" download>hw10.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw11.tex" download>hw11.tex</a>
+            </li>
+          </ul>
+          <h3>实验作业</h3>
+          <ul class="file-list">
+            <li>
+              <strong>hw1</strong>
+              <a href="../../assets/numerical-analysis/homework/hw1.m" download>hw1.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw1_report.tex" download>hw1_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw1_report.pdf" download>hw1_report.pdf</a>
+            </li>
+            <li>
+              <strong>hw2</strong>
+              <a href="../../assets/numerical-analysis/homework/hw2.m" download>hw2.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw2_report.tex" download>hw2_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw2_report.pdf" download>hw2_report.pdf</a>
+            </li>
+            <li>
+              <strong>hw3</strong>
+              <a href="../../assets/numerical-analysis/homework/hw3_1.m" download>hw3_1.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw3_2.m" download>hw3_2.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw3_linear_spline.m" download>hw3_linear_spline.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw3_clamped_cubic_spline.m" download>hw3_clamped_cubic_spline.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw3_natural_cubic_spline.m" download>hw3_natural_cubic_spline.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw3_hermite_spline.m" download>hw3_hermite_spline.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw3_report.tex" download>hw3_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw3_report.pdf" download>hw3_report.pdf</a>
+            </li>
+            <li>
+              <strong>hw4</strong>
+              <a href="../../assets/numerical-analysis/homework/hw4_1.m" download>hw4_1.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw4_report.tex" download>hw4_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw4_report.pdf" download>hw4_report.pdf</a>
+            </li>
+            <li>
+              <strong>hw6</strong>
+              <a href="../../assets/numerical-analysis/homework/hw6_1.m" download>hw6_1.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw6_2.m" download>hw6_2.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw6_report.tex" download>hw6_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw6_report.pdf" download>hw6_report.pdf</a>
+            </li>
+            <li>
+              <strong>hw7</strong>
+              <a href="../../assets/numerical-analysis/homework/hw7_1.m" download>hw7_1.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw7_2.m" download>hw7_2.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw7_report.tex" download>hw7_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw7_report.pdf" download>hw7_report.pdf</a>
+            </li>
+            <li>
+              <strong>hw8</strong>
+              <a href="../../assets/numerical-analysis/homework/hw8.m" download>hw8.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw8_report.tex" download>hw8_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw8_report.pdf" download>hw8_report.pdf</a>
+            </li>
+            <li>
+              <strong>hw9</strong>
+              <a href="../../assets/numerical-analysis/homework/hw9.m" download>hw9.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw9_report.tex" download>hw9_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw9_report.pdf" download>hw9_report.pdf</a>
+            </li>
+            <li>
+              <strong>hw10</strong>
+              <a href="../../assets/numerical-analysis/homework/hw10.m" download>hw10.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw10_2.m" download>hw10_2.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw10_report.tex" download>hw10_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw10_report.pdf" download>hw10_report.pdf</a>
+            </li>
+            <li>
+              <strong>hw11</strong>
+              <a href="../../assets/numerical-analysis/homework/hw11_1.m" download>hw11_1.m</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw11_2.nb" download>hw11_2.nb</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw11_report.tex" download>hw11_report.tex</a>
+              ·
+              <a href="../../assets/numerical-analysis/homework/hw11_report.pdf" download>hw11_report.pdf</a>
+            </li>
           </ul>
         </section>
 

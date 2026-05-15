@@ -1,0 +1,206 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}   % 统一页面边距
+\usepackage{verbatim}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{ctex}
+
+\title{第四次作业：傅里叶投影与傅里叶插值}
+\author{PB23000270李佩优}  
+
+\begin{document}
+\maketitle
+
+\section{引言}
+
+本作业旨在研究周期函数的傅里叶逼近方法，包括傅里叶投影（Fourier projection）和傅里叶插值（Fourier interpolation）。给定一个以 $2\pi$ 为周期的函数 $f(x)$，其傅里叶级数为
+\[
+f(x) = \sum_{k=-\infty}^{\infty} \hat{f}_k e^{ikx}, \quad 
+\hat{f}_k = \frac{1}{2\pi} \int_0^{2\pi} f(x) e^{-ikx} dx.
+\]
+截断至 $|k|\le K$（其中 $N=2K$ 为总模态数）得到傅里叶投影 $P_N f$：
+\[
+P_N f(x) = \sum_{k=-K}^{K} \hat{f}_k e^{ikx}.
+\]
+另一方面，傅里叶插值是在 $N+1$ 个等距节点 $x_j = \frac{2\pi j}{N+1}$ 上构造一个三角多项式 $I_N f$，使得 $I_N f(x_j)=f(x_j)$，且其模态数同样为 $N+1$（$k=-K,\dots,K$）。本文实现并比较了两种方法在两个典型周期函数上的逼近误差。
+
+\section{方法}
+
+\subsection{测试函数}
+选取两个具有代表性的周期函数：
+\begin{itemize}
+  \item $u(x) = \dfrac{1}{5-4\cos x}$。该函数解析且无限光滑，其傅里叶系数呈指数衰减。
+  \item $v(x) = \sin(x/2)$。该函数在 $[0,2\pi]$ 上连续，但其周期延拓后在端点 $x=0,2\pi$ 处导数不连续（左导数 $-1/2$，右导数 $1/2$）。其傅里叶系数解析式为 $\hat{v}_k = \frac{(-1)^k}{\pi(1-4k^2)}$，渐近行为 $|\hat{v}_k| \sim C/k^2$，因此属于代数衰减。
+\end{itemize}
+
+\subsection{离散计算}
+傅里叶系数采用矩形法数值积分近似：
+\[
+\hat{f}_k \approx \frac{1}{M} \sum_{j=1}^{M} f(x_j) e^{-ikx_j},
+\]
+其中 $\{x_j\}$ 为 $[0,2\pi)$ 上的 $M$ 个等距采样点，$M = 2^{\lceil\log_2(10\max(N,64))\rceil}$ 以保证积分精度。插值系数直接由 $N+1$ 个等距节点上的离散傅里叶变换给出：
+\[
+d_k = \frac{1}{N+1} \sum_{j=0}^{N} f(x_j) e^{-ikx_j},\quad x_j = \frac{2\pi j}{N+1}.
+\]
+然后在精细网格 $x_{\text{fine}}$ 上重构 $P_N f$ 和 $I_N f$，并计算逐点误差。收敛阶定义为
+\[
+\text{Order} = \log_2\left(\frac{\text{Err}(N)}{\text{Err}(2N)}\right),
+\]
+其中 $\text{Err}(N)$ 为 $L^\infty$ 误差（最大绝对误差）。
+
+\subsection{实验设置}
+取 $N = 4, 8, 16, 32, 64$（对应 $K=N/2$）。对每个 $N$，计算投影误差 $\varepsilon_P(x)=|f(x)-P_N f(x)|$ 和插值误差 $\varepsilon_I(x)=|f(x)-I_N f(x)|$，并在半对数坐标下绘制误差曲线。同时绘制 $P_N f$ 和 $I_N f$ 本身，观察逼近效果。
+
+\section{数值实现细节}
+
+\subsection{算法要点}
+两种方法的核心区别在于：
+\begin{itemize}
+  \item \textbf{傅里叶投影}：使用高密度采样（$M \gg N$）近似连续傅里叶积分，计算系数 $\hat{f}_k$，然后重构。
+  \item \textbf{傅里叶插值}：仅使用 $N+1$ 个插值节点上的函数值，通过离散傅里叶变换直接得到系数 $d_k$，然后重构。
+\end{itemize}
+% 本报告提供的代码采用显式循环实现，便于理解算法原理。实际应用中，应改用 \texttt{fft} 函数将复杂度从 $O(KM)$ 降至 $O(M\log M)$。对于投影，需先计算 $M$ 个采样点的 FFT（$M\sim O(N)$），然后截取相应模态；对于插值，直接对 $N+1$ 个节点值做 FFT 即可。两种方法的计算成本相近，但投影需要更多的函数求值（$M$ 次 vs $N+1$ 次）。
+
+\subsection{代码使用说明}
+\begin{itemize}
+  \item \textbf{软件环境}：MATLAB R2020a 及以上版本/北太天元。
+  \item \textbf{运行方式}：将脚本 \texttt{hw4.m} 保存到当前目录，在命令窗口输入 \texttt{hw4} 运行。脚本会自动生成误差图和逼近曲线，并在命令窗口打印收敛阶表格。
+  \item \textbf{切换测试函数}：修改脚本开头的 \texttt{f = u;} 为 \texttt{f = v;}，同时将 \texttt{fname} 改为 \texttt{'v'}。
+  \item \textbf{修改模态数}：调整 \texttt{N\_list} 的值（注意 $N$ 必须为偶数）。
+\end{itemize}
+
+\section{结果与讨论}
+
+\subsection{函数 $v(x)=\sin(x/2)$}
+图~\ref{fig:v_error} 展示了投影与插值误差随 $N$ 增大的变化。两种方法的 $L^\infty$ 误差均随 $N$ 增大而减小，但衰减速度较慢。理论分析表明，由于 $|\hat{v}_k|\sim 1/k^2$，截断后的最大模误差 $\sim \sum_{|k|>K} 1/|k| \sim 1/K$，$L^2$ 误差 $\sim \left(\sum_{|k|>K} 1/k^4\right)^{1/2} \sim K^{-3/2}$。表~\ref{tab:v_conv} 中最大模误差的数值收敛阶约为 $1.0$，与理论一致（注意 $K=N/2$，故 $O(N^{-1})$）。同时注意到插值误差略大于投影误差，且在整个区间上分布较均匀。
+
+图~\ref{fig:v_func} 给出了投影和插值得到的近似函数。当 $N=4$ 时，近似曲线明显偏离真实函数；随着 $N$ 增大，曲线逐渐逼近 $\sin(x/2)$，但在 $x=2\pi$ 附近仍存在微小振荡。由于函数本身连续，该振荡并非经典的吉布斯跳跃现象，而是由端点导数不连续导致的局部慢收敛。
+
+\subsection{函数 $u(x)=\dfrac{1}{5-4\cos x}$}
+对于光滑函数 $u(x)$，傅里叶系数呈指数衰减，因此误差随 $N$ 指数下降。图~\ref{fig:u_error} 表明，当 $N$ 从 4 增加到 64 时，$L^\infty$ 误差从约 $10^{-1}$ 迅速降至 $10^{-12}$ 以下。投影与插值的精度几乎相同，且在整个区间上误差分布非常均匀。
+
+表~\ref{tab:u_conv} 和表~\ref{tab:v_conv} 列出了投影误差的 $L^\infty$ 范数及其收敛阶。对于 $u$，每次 $N$ 加倍，误差平方，收敛阶翻倍，这是指数收敛的典型特征；对于 $v$，收敛阶稳定在 $1$ 附近，符合代数收敛 $O(N^{-1})$。
+
+\subsection{计算精度与成本对比}
+对于 $u(x)$，当 $N=64$ 时，投影误差达到 $10^{-10}$ 量级，插值误差略大（$1.6\times10^{-10}$），两者基本一致。此时误差已远低于单精度极限，进一步增加 $N$ 受限于函数值计算中的舍入误差。
+
+从计算成本看，投影需要 $M = 2^{\lceil\log_2(10\max(N,64))\rceil}$ 个采样点，约为 $N$ 的 $10$ 倍；插值仅需 $N+1$ 个节点。若采用显式循环，投影的复杂度为 $O(KM)$，插值为 $O(K(N+1))$，投影约高出 $M/(N+1)\approx 10$ 倍。但若使用 FFT，投影的复杂度为 $O(M\log M)$，插值为 $O((N+1)\log(N+1))$，两者相当，且投影因采样点更多而略慢。实际应用中，对于光滑函数，插值已足够精确且更高效。
+
+\subsection{光滑性对逼近损失的影响}
+将光滑函数 $u(x)$ 与非光滑函数 $v(x)$ 的 $L^\infty$ 误差并排对比（表~\ref{tab:compare_loss}），可以清晰看到光滑性的关键作用：
+\begin{itemize}
+  \item \textbf{收敛速度差异}：$N$ 从 4 增加到 64 时，$u$ 的误差下降超过 9 个数量级，而 $v$ 的误差仅下降约 1 个数量级。
+  \item \textbf{相同 $N$ 下的精度}：$N=16$ 时 $u$ 的误差已低于 $10^{-2}$，而 $v$ 的误差仍在 $10^{-2}$ 量级；$N=32$ 时 $u$ 的误差达到 $10^{-5}$，远超 $v$ 在 $N=64$ 时的精度。
+  \item \textbf{实际应用启示}：对于光滑周期问题，傅里叶方法极为高效；对于仅连续或带尖点的函数，需要采用滤波、谱粘性法或非周期逼近方法来改善收敛性。
+\end{itemize}
+
+\section{结论}
+
+本文通过数值实验比较了傅里叶投影和傅里叶插值对两个典型周期函数的逼近性能，得到以下结论：
+\begin{enumerate}
+  \item 对于无限光滑的周期函数，傅里叶投影和插值均能实现指数收敛（误差随 $N$ 指数下降），且两者精度相当。插值仅需 $N+1$ 个函数值，计算更经济。
+  \item 对于导数不连续的连续周期函数，傅里叶逼近仅具有代数收敛速度：$L^\infty$ 误差 $\sim O(N^{-1})$，$L^2$ 误差 $\sim O(N^{-3/2})$。此时端点附近出现局部慢收敛，但整体误差仍随 $N$ 增大而减小。
+  \item 数值收敛阶与理论分析一致，验证了傅里叶级数截断误差对函数光滑性的敏感性。
+\end{enumerate}
+本报告提供的 MATLAB 代码完整实现了两种方法，可作为进一步研究谱方法的基础。
+
+\appendix
+
+\section{图表附录}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{v_err.png}
+\caption{函数 $v(x)=\sin(x/2)$ 的逼近误差（对数纵轴）。左：投影误差；右：插值误差。}
+\label{fig:v_error}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{u_err.png}
+\caption{函数 $u(x)=1/(5-4\cos x)$ 的逼近误差（对数纵轴）。左：投影误差；右：插值误差。}
+\label{fig:u_error}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{v_.png}
+\caption{函数 $v(x)=\sin(x/2)$ 的逼近曲线。左：投影；右：插值。}
+\label{fig:v_func}
+\end{figure}
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\textwidth]{u_.png}
+\caption{函数 $u(x)=1/(5-4\cos x)$ 的逼近曲线。左：投影；右：插值。}
+\label{fig:u_func}
+\end{figure}
+
+\newpage
+\begin{table}[!htb]
+\caption{函数 $u$ 投影误差与插值误差的收敛性（$L^\infty$ 误差）}
+\centering
+\bigskip
+\begin{tabular}{c c c c c}
+\toprule
+$N$ & Projection error & Order & Interpolation error & Order \\
+\midrule
+4  & $1.6665\times10^{-1}$ & --- & $1.8127\times10^{-1}$ & --- \\
+8  & $4.1659\times10^{-2}$ & 2.0001 & $4.1832\times10^{-2}$ & 2.1155 \\
+16 & $2.6029\times10^{-3}$ & 4.0005 & $2.6906\times10^{-3}$ & 3.9586 \\
+32 & $1.0156\times10^{-5}$ & 8.0016 & $1.0757\times10^{-5}$ & 7.9665 \\
+64 & $1.5434\times10^{-10}$ & 16.006 & $1.6453\times10^{-10}$ & 15.997 \\
+\bottomrule
+\end{tabular}
+\label{tab:u_conv}
+\end{table}
+
+\begin{table}[!htb]
+\caption{函数 $v$ 投影误差与插值误差的收敛性（$L^\infty$ 误差）}
+\centering
+\bigskip
+\begin{tabular}{c c c c c}
+\toprule
+$N$ & Projection error & Order & Interpolation error & Order \\
+\midrule
+4  & $1.2575\times10^{-1}$ & --- & $1.2318\times10^{-1}$ & --- \\
+8  & $6.9166\times10^{-2}$ & 0.8625 & $6.6975\times10^{-2}$ & 0.8790 \\
+16 & $3.5881\times10^{-2}$ & 0.9468 & $3.5207\times10^{-2}$ & 0.9277 \\
+32 & $1.7729\times10^{-2}$ & 1.0171 & $1.8097\times10^{-2}$ & 0.9602 \\
+64 & $8.2412\times10^{-3}$ & 1.1052 & $9.1768\times10^{-3}$ & 0.9797 \\
+\bottomrule
+\end{tabular}
+\label{tab:v_conv}
+\end{table}
+
+\begin{table}[!htb]
+\caption{$u$ 与 $v$ 的投影 $L^\infty$ 误差对比}
+\centering
+\begin{tabular}{c c c}
+\toprule
+$N$ & $u$ 误差 & $v$ 误差 \\
+\midrule
+4  & $1.67\times10^{-1}$ & $1.26\times10^{-1}$ \\
+8  & $4.17\times10^{-2}$ & $6.92\times10^{-2}$ \\
+16 & $2.60\times10^{-3}$ & $3.59\times10^{-2}$ \\
+32 & $1.02\times10^{-5}$ & $1.77\times10^{-2}$ \\
+64 & $1.54\times10^{-10}$ & $8.24\times10^{-3}$ \\
+\bottomrule
+\end{tabular}
+\label{tab:compare_loss}
+\end{table}
+
+\newpage
+
+\section{计算机代码}
+以下为完整的 MATLAB 代码，包含主程序以及傅里叶投影、插值函数。
+
+\small
+\hrule
+\verbatiminput{hw4.m}
+\hrule
+
+\end{document}
