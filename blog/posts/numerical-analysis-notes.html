@@ -6,6 +6,7 @@
     <title>数值分析课程笔记整理 — 李佩优</title>
     <meta name="description" content="数值分析课程笔记：课程脉络、个人理解与附件（占位）。" />
     <link rel="stylesheet" href="../../css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   </head>
   <body>
     <header class="top">
@@ -81,16 +82,71 @@
         <section aria-labelledby="ode-heading">
           <h2 id="ode-heading">常微分方程数值解</h2>
           <h3>解的存在性和唯一性</h3>
-          <p></p>
+          <p>常微分方程的一般形式为：\(x'(t) = f(t, x)\)，初始条件 \(x(t_0)=x_0\)。</p>
+          <p>第一存在性定理，初值问题：若\(f\)在中心为\((t_0,x_0)\)的矩形
+            $$R = {（t,x）:|t-t_0|\leq \alpha, |x-x_0|\leq \beta}$$
+            内连续，则对于\(|t-t_0|\leq min(\alpha,\beta/M)\)初值问题有解\(x(t)\),其中M是\(|f(t,x)|\)在矩形R内的最大值.
+          </p>
+          <p>
+            唯一性定理，初值问题：若\(f\)和\(\partial f/\partial x\)在(2)式定义的矩形R内连续，则初值问题(1)在区间\(|t-t_0|< min(\alpha,\beta/M )\)内有唯一解.
+          </p>
+          <p>
+            存在性定理，初值问题：若\(f\)在带\(a\leq t\leq b, \quad -\infty < x < +\infty \)内连续并满足不等式
+            $$|f(t,x_1) - f(t,x_2)|\leq L|x_1 - x_2|$$则初值问题在区间\([a,b]\)上有唯一解.
+          </p>
+          <p>picard 存在唯一定理 (?)</p>
+          <p>欧拉法的递推公式为：
+            $$ y_{n+1} = y_n + h \, f(t_n, y_n) $$
+            其中 \(h\) 是步长。
+          </p>
           <h3>泰勒级数方法</h3>
-          <p></p>
+          <p>一大方法即通过列表（\(t_0,x_0）,(t_1,x_1)...\)递推计算 ，单步法，即只用前一步的信息</p>
+          <p>条件：\(f\)的各种偏导存在</p>
+          <p>泰勒级数方法：\(x =x + h(x' + \frac{h}{2}(x'' + \frac{h}{3}(x''' + \frac{h}{4}(x^{(4)})))) \)</p>
+          <p> 好处：有任意高精度的潜力；坏处：要求很多导，复杂</p>
+          <p>舍入误差：计算机位数局限；舍入误差：算法误差</p>
+          <p>延迟微分方程法</p>
           <h3>龙格-库塔方法</h3>
-          <p></p>
+          <p>推导：
+            $$x(t+h) = x(t) + h x'(t) + \frac{h^2}{2!}x''(t) + \frac{h^3}{3!}x'''(t) + \cdots $$
+            代入\(x' = f(t,x)\)
+            $$x(t+h) = x + \frac{1}{2}hf + \frac{1}{2}h[f + hf_{t} + hff_{x}] + \mathcal{O}(h^3)$$
+            代入\(f(t+h,x+hf) = f + hf_t +hff_x + \mathcal{O}(h^2)\)
+            $$x(t+h) = x(t) + \frac{h}{2}f(t,x) + \frac{h}{2}f(t+h, x+f(t+x))$$
+          </p>
+          <p>二阶龙格-库塔公式：\(x(t+h) = x + \omega_1 hf + \omega_2 hf(t+\alpha h, x+\beta hf)\);   条件\(\omega_1 + \omega_2 = 1; \omega_2\cdot\alpha = \omega_2\cdot\beta = \frac{1}{2}\)</p>
+          <p>四阶龙格‑库塔方法：
+            $$x(t+h) = x(t) + \frac{1}{6}[F_1 + 2F_2 + 2F_3 + F_4]$$
+            $$F_1 = hf(t,x)$$
+            $$F_2 = hf(t+\frac{1}{2}h, x+\frac{1}{2}F_1)$$
+            $$F_3 = hf(t+\frac{1}{2}h, x+\frac{1}{2}F_2)$$
+            $$F_4 = hf(t+h, x+F_3)$$
+          </p>
+          <p>四阶龙格‑库塔方法的局部截断误差为 \(\mathcal{O}(h^5)\)，整体误差为 \(\mathcal{O}(h^4)\)。</p>
+          <p>五个函数赋值地四阶方法 六个函数赋值地五阶方法 （龙格‑库塔-费尔贝格方法）</p>
+          <p>五阶公式记为\(x(t+h) = x(t) + \sum^{6}_{i = 1} a_i F_i\)</p>
+          <p>四阶公式记为\(\bar{x}(t+h) = x(t) + \sum^{6}_{i = 1} b_i F_i\)</p>
+          <p>\(F_i = hf(t+ c_i h , x + \sum^{i-1}_{j = 1} d_{ij} F_{j})\)<br>
+            \(e = x(t+h) - \bar{x}(t+h)\)可以简略估计截断误差，因而可以控制步长，\(h = 0.9 h [\delta/|e|]^{1/(1+p)}\),p是阶数
+          </p>
           <h3>多步法</h3>
-          <p></p>
+          <p>不仅用到前一步，也用到前面多步的信息，可能思想类似于picard存在性定理的证明，一致收敛列？一样要微分方程变积分方程，使用数值积分的技巧（迭代？）</p>
+          <p>亚当斯-巴什福式：\(x_{n+1} = x_{n} + af_{n} + b f_{n-1} + c f_{n-2}+ \cdots  f_i = f(t_i,x_i)\) 
+            abcd的数值由线性方程组决定，五阶以下多项式严格满足，
+          </p>
+          <p>亚当-莫尔顿公式：\(x_{n+1} = x_{n} + af_{n+1} + bf_{n} + c f_{n-1}\)</p>
+          <p>一般形式：\(a_kx_n + a_{k-1}x_{n-1} +\cdots + a_{0}x_{n-k} = h[b_kf_n+ b_{k-1}f_{n-1}+ \cdots+ b_0f_{n-k}]\)</p>
+          <p>性质定理：</p>
           <h3>局部误差和整体误差：稳定性</h3>
-          <p></p>
-          <h3>方程组和告诫常微分方程</h3>
+          <p>显式，隐式</p>
+          <p>
+            稳定的，若p（=a_k z^{k} + a_{k-1}z^{k-1} + \coots + a_0）的一切根位于圆盘\(|z|\leq 1\),且模为1的根为单根
+          </p>
+          <p>
+            相容的，若\(p(1) = 0 \;\;;\;\;p'(1) = q(1)\)
+          </p>
+          <p>稳定性和相容性定理：收敛等价于稳定+相容</p>
+          <h3>方程组和高阶常微分方程</h3>
           <p></p>
           <h3>边值问题</h3>
           <p></p>
