@@ -20,68 +20,85 @@
 
     <main class="wrap">
       <section id="about" class="hero" aria-labelledby="about-heading">
-        <h1 id="about-heading">你好，我是李佩优（LiPeiyou）</h1>
-        <p class="sub">lipeiyou · 个人学习与笔记主页</p>
-        <p class="lead">
-          兴趣方向包括计算数学、计算机图形学、具身智能、自动化、深度学习、大数据、人工智能与大模型等。本页用于整理公开的学习与项目卡片，详细笔记见博客。
-        </p>
-        <ul class="tags" aria-label="兴趣关键词">
-          <li>计算数学</li>
-          <li>图形学</li>
-          <li>具身智能</li>
-          <li>深度学习</li>
-          <li>大模型</li>
+        <h1 id="about-heading">李佩优 / Li Peiyou</h1>
+        <p class="sub">Applied Mathematics · Information and Computing Science</p>
+        <p class="lead">Research Interests</p>
+        <ul class="tags" aria-label="Research Interests">
+          <li>Scientific Computing</li>
+          <li>Computer Graphics</li>
+          <li>Geometry Processing</li>
+          <li>Embodied Intelligence</li>
+          <li>AI for Science</li>
         </ul>
+      </section>
+
+      <section id="focus" aria-labelledby="focus-heading" style="margin-bottom: 1.5rem;">
+        <h2 id="focus-heading">Current Focus</h2>
+        <div class="grid cols-2">
+          <article class="card">
+            <h3>Scientific Computing</h3>
+            <ul>
+              <li>PDE Solvers</li>
+              <li>Numerical Methods</li>
+              <li>AI for Science</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Computer Graphics</h3>
+            <ul>
+              <li>Physical Simulation</li>
+              <li>Geometry Processing</li>
+              <li>Rendering</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Embodied AI</h3>
+            <ul>
+              <li>Dexterous Manipulation</li>
+              <li>Human-Robot Interaction</li>
+              <li>World Models</li>
+            </ul>
+          </article>
+        </div>
       </section>
 
       <section id="projects" aria-labelledby="projects-heading">
         <h2 id="projects-heading">项目与学习</h2>
         <div class="grid cols-2">
           <article class="card">
-            <h3>信息与计算科学专业方向相关课程</h3>   
-            <p>专业基础课：</p>
+            <h3>Mathematics</h3>
             <ul>
-              <li>数学分析(B3)，线性代数(B2)，概率论，微分方程引论，实分析，复分析，近世代数，光学B，原子物理B，大学物理-综合实验B</li>
+              <li>Real Analysis</li>
+              <li>Functional Analysis</li>
+              <li>Differential Geometry</li>
+              <li>Numerical Analysis</li>
+              <li>Numerical Linear Algebra</li>
             </ul>
-            <p>专业核心课：</p>
+            <h3>Computer Science</h3>
             <ul>
-              <li>泛函分析，微分几何，数理统计，数值代数，数值分析，数学建模，运筹学（未修）</li>
+              <li>Algorithms</li>
+              <li>Machine Learning</li>
+              <li>Deep Learning</li>
+              <li>Computer Graphics</li>
             </ul>
-            <p>专业选修课（已修/在修）：</p>
-            <ul>
-              <li>计算机图形学，计算机图形学前沿，算法基础，机器学习，深度学习基础，小波分析</li>
-            </ul>
-            <p>专业选修课（未修）：</p>
-            <ul>
-              <li>数学实验，数据库系统概论，数据分析及实践，大数据系统及综合实验，有限元方法，偏微分方程数值解</li>
-            </ul>
-            <p><a href="blog/posts/numerical-analysis-notes.html">数值分析笔记</a></p>
+            <p><a href="blog/posts/course-record.html">See Full Transcript →</a></p>
           </article>
           <article class="card">
-            <h3>参与的项目</h3>
-            <p>长文本评估项目：</p>
-            <ul>
-              <!-- <li>提示词工程，采用多智能体协作的思想，仿照论文提交的审核过程，
-                分设Judger，Reviewer，Writer三个角色，在Reviewer给出第一轮打分以及评审意见后，
-                Writer根据意见为文章辩护，完成一轮rebuttal，
-                Reviewer依据上轮辩护再次打分并给出评审意见，多轮rebuttal后最终由Judger给出最终评分。</li> -->
-              <li>提示词工程，采用多智能体协作的思想，仿照论文提交的审核过程，
-                分设Judger，Reviewer，Writer三个角色，进行多轮rebuttal后最终由Judger给出最终分数。</li>
-              <li>在我们找到的三个数据集上，实验有一定效果，但不是突破性的结果，但是仍然具有一定的参考价值。</li>
-            </ul>
-            <p>灵巧手的精准操控：</p>
-            <ul>
-              <li>本项目采用aubo机械臂，inspire灵巧手，结合深度摄像头
-                可以通过语音提示，自主识别并拾取物品，并将其放置到指定位置。
-              </li>
-            </ul>
-            <p><a href="blog/posts/dexterous-hand-control.html">灵巧手的精准操控</a></p>
-            <p>校内赛robogame：</p>
-            <ul>
-              <li>~
-              </li>
-            </ul>
-            <p><a href="blog/index.html">进入博客列表</a></p>
+            <h3>Research Projects</h3>
+
+            <h4 style="margin:0.5rem 0 0.15rem;">Dexterous Hand Manipulation</h4>
+            <p style="font-size:0.85rem;color:var(--muted);">ROS2 · Aubo · Inspire Hand · RGB-D</p>
+            <p style="font-size:0.9rem;">Developed an integrated manipulation system for object detection, grasp planning and voice-guided dexterous grasping.</p>
+
+            <h4 style="margin:0.5rem 0 0.15rem;">LLM Evaluation Framework</h4>
+            <p style="font-size:0.85rem;color:var(--muted);">LLM · Multi-Agent · Evaluation</p>
+            <p style="font-size:0.9rem;">Built a Judger–Reviewer–Writer framework for long-context reasoning evaluation with multi-round rebuttal.</p>
+
+            <h4 style="margin:0.5rem 0 0.15rem;">RoboGame (RoboMaster)</h4>
+            <p style="font-size:0.85rem;color:var(--muted);">STM32 · PCB · Embedded Systems</p>
+            <p style="font-size:0.9rem;">Developed embedded control systems for autonomous robots; 1st prize (2025) and 4th place in校内竞技组.</p>
+
+            <p style="margin-top:0.6rem;"><a href="blog/index.html">View All Projects →</a></p>
           </article>
           <article class="card">
             <h3>技术栈</h3>
@@ -103,15 +120,17 @@
             <p><a href="https://github.com/peiyouli-1102">我的 GitHub 主页</a></p>
           </article>
           <article class="card">
-            <h3>博客列表</h3>
-            <p>技术笔记与课程记录。</p>
+            <h3>Technical Notes</h3>
             <ul>
-              <li><a href="blog/posts/resume.html">个人简历</a></li>
-              <li><a href="blog/posts/dexterous-hand-control.html">灵巧手的精准操控</a></li>
-              <li><a href="blog/posts/summer-camp-review.html">夏令营知识复习</a></li>
-              <li><a href="blog/posts/numerical-analysis-notes.html">数值分析课程笔记整理</a></li>
+              <li><a href="blog/posts/numerical-analysis-notes.html">Numerical Analysis</a></li>
+              <li><a href="blog/posts/course-record.html">课程修读记录</a></li>
             </ul>
-            <p><a href="blog/index.html">查看全部 →</a></p>
+            <h3>Miscellaneous</h3>
+            <ul>
+              <li><a href="blog/posts/summer-camp-review.html">夏令营知识复习</a></li>
+            </ul>
+            <p><a href="blog/posts/resume.html">CV / 简历 →</a></p>
+            <p><a href="blog/index.html">View All Blog Posts →</a></p>
           </article>
         </div>
 
@@ -123,7 +142,6 @@
 
     <footer class="foot">
       <p>© <span id="year"></span> 李佩优 · 静态页面 · GitHub Pages</p>
-      <!-- 访问量由第三方「不蒜子」统计，需联网加载；广告拦截可能影响计数 -->
       <p class="stats" aria-live="polite">
         本站浏览量 <span id="busuanzi_value_site_pv">…</span>
         · 访客数 <span id="busuanzi_value_site_uv">…</span>

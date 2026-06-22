@@ -1,0 +1,518 @@
+我觉得可以把修改分成两条线：
+
+# 第一部分：本周就能完成的重构（投入 1~2 天）
+
+目标：
+
+> 不增加任何新内容，仅重新组织已有内容。
+
+这部分收益最高。
+
+---
+
+# 1. 首页结构重构
+
+目前像：
+
+```text
+About
+↓
+课程
+↓
+项目
+↓
+技能
+↓
+博客
+```
+
+建议改成：
+
+```text
+About
+↓
+Research Interests
+↓
+Selected Projects
+↓
+Selected Notes
+↓
+Skills
+↓
+CV
+```
+
+因为老师一般只会看前两屏。
+
+---
+
+## About 改法
+
+现在：
+
+```text
+兴趣方向包括：
+计算数学
+图形学
+自动化
+大数据
+AI
+深度学习
+...
+```
+
+建议缩减为：
+
+```text
+Research Interests
+
+• Scientific Computing
+• Computer Graphics
+• Geometry Processing
+• Embodied Intelligence
+• AI for Science
+```
+
+不要超过 5 个。
+
+---
+
+# 2. 课程部分大幅压缩
+
+这是我最建议立即修改的。
+
+现在课程太长。
+
+建议保留：
+
+## Mathematics
+
+```text
+Real Analysis
+Functional Analysis
+Differential Geometry
+Numerical Analysis
+Numerical Linear Algebra
+```
+
+---
+
+## Computer Science
+
+```text
+Algorithms
+Machine Learning
+Deep Learning
+Computer Graphics
+```
+
+---
+
+其余隐藏到：
+
+```text
+See Full Transcript
+```
+
+或者单独页面。
+
+---
+
+# 3. 博客首页改分类
+
+现在最像：
+
+```text
+博客列表
+```
+
+建议直接改：
+
+```text
+Research Projects
+```
+
+下面放：
+
+```text
+Dexterous Hand Manipulation
+LLM Evaluation Framework
+RoboGame
+```
+
+---
+
+再单独一栏：
+
+```text
+Technical Notes
+```
+
+下面放：
+
+```text
+Numerical Analysis
+PDE
+Graphics
+Wavelets
+```
+
+---
+
+再单独：
+
+```text
+Miscellaneous
+```
+
+下面放：
+
+```text
+夏令营总结
+学习经验
+```
+
+---
+
+仅这一项就会专业很多。
+
+---
+
+# 4. 增加一个 Research Snapshot
+
+放在首页最上方。
+
+例如：
+
+```text
+Current Focus
+
+Scientific Computing
+├─ PDE Solvers
+├─ Numerical Methods
+└─ AI for Science
+
+Computer Graphics
+├─ Physical Simulation
+├─ Geometry Processing
+└─ Rendering
+
+Embodied AI
+├─ Dexterous Manipulation
+└─ World Models
+```
+
+这是导师最喜欢看的东西之一。
+
+因为一眼知道：
+
+> 你未来想做什么。
+
+---
+
+# 5. 给每个项目补三行摘要
+
+目前项目介绍太短。
+
+例如：
+
+---
+
+### Dexterous Hand Manipulation
+
+```text
+Keywords:
+ROS2 · Aubo · Inspire Hand · RGB-D
+
+Developed an integrated manipulation system
+for object detection, grasp planning and
+voice-guided dexterous grasping.
+```
+
+---
+
+### LLM Evaluation
+
+```text
+Keywords:
+LLM · Multi-Agent · Evaluation
+
+Built a Judger–Reviewer–Writer framework
+for long-context reasoning evaluation.
+```
+
+---
+
+这样老师甚至不用点进去。
+
+---
+
+# 第二部分：最值得补写的项目复盘
+
+这是长期收益部分。
+
+---
+
+# 优先级 S
+
+必须补。
+
+---
+
+## 1. 灵巧手项目
+
+这是你目前最有辨识度的项目。
+
+因为：
+
+```text
+数学本科
++
+机器人
++
+具身智能
+```
+
+这个组合很少。
+
+---
+
+建议单独做：
+
+```text
+projects/dexhand
+```
+
+结构：
+
+```text
+1 Motivation
+
+2 System Architecture
+
+3 Hardware
+
+4 Software
+
+5 Grasp Pipeline
+
+6 Challenges
+
+7 Results
+
+8 Future Work
+```
+
+---
+
+里面最好放：
+
+* 系统框图
+* 硬件照片
+* 抓取视频
+
+---
+
+这是最值得投入的。
+
+---
+
+# 2. 长文本评测项目
+
+这是第二优先级。
+
+因为：
+
+很多人会说：
+
+```text
+做过大模型
+```
+
+但老师不知道做了什么。
+
+---
+
+建议复盘：
+
+```text
+Problem
+
+Framework
+
+Judger
+Reviewer
+Writer
+
+Prompt Design
+
+Evaluation Metrics
+
+Experiments
+
+Lessons Learned
+```
+
+---
+
+重点不要写：
+
+```text
+用了GPT
+```
+
+而写：
+
+```text
+为什么这样设计Agent
+```
+
+---
+
+# 优先级 A
+
+强烈推荐。
+
+---
+
+## 3. MPM项目
+
+这个其实特别适合你。
+
+因为：
+
+```text
+应用数学
++
+图形学
++
+物理模拟
+```
+
+高度统一。
+
+---
+
+建议写：
+
+```text
+MPM Background
+
+Grid-Particle Transfer
+
+Implementation
+
+Numerical Stability
+
+Visualization
+
+Results
+```
+
+---
+
+这个项目很容易吸引：
+
+* 图形学老师
+* 科学计算老师
+* AI4Science老师
+
+---
+
+# 4. PDE项目
+
+把课程项目升级。
+
+不要写：
+
+```text
+作业
+```
+
+写：
+
+```text
+Numerical Solution of PDEs
+```
+
+---
+
+内容：
+
+```text
+Model
+
+Discretization
+
+Finite Difference
+
+Boundary Conditions
+
+Visualization
+
+Performance
+```
+
+---
+
+# 优先级 B
+
+有时间再写。
+
+---
+
+## 5. Wavelet项目
+
+如果未来考虑：
+
+* 图形学
+* 几何处理
+* 科学计算
+
+这个值得保留。
+
+---
+
+但暂时优先级不如前面几个。
+
+---
+
+# 我认为最合理的最终结构
+
+未来主页应该像：
+
+```text
+Home
+
+About
+
+Research Interests
+
+Selected Projects
+    DexHand
+    LLM Evaluation
+    MPM
+
+Technical Notes
+    PDE
+    Wavelets
+    Graphics
+
+Reading Notes
+    HOI
+    World Models
+    Geometry Processing
+
+CV
+```
+
+其中真正需要你投入时间新写的，其实只有 4 篇：
+
+1. DexHand Project Page
+2. LLM Evaluation Project Page
+3. MPM Project Page
+4. PDE Project Page
+
+如果这四篇写出来，我认为你的网站会从现在的“优秀学习博客”变成“具备科研作品集属性的学术主页”。
+
+对于推免老师而言，这种变化比再多写十篇课程笔记更有价值。尤其是 **DexHand + MPM** 这两个项目，它们和你“应用数学背景转图形学/具身智能”的故事线是完全一致的。
