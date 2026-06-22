@@ -343,3 +343,9 @@ article.post p {
 .back {
   margin-top: 2rem;
 }
+
+/* PDF 作业列表：标题 + 副标题 */
+.file-list .subtitle {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
